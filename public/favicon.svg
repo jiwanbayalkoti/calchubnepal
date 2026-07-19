@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AI Calculator Hub">
+  <defs>
+    <linearGradient id="g" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B6E4F"/>
+      <stop offset="1" stop-color="#084C37"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <rect x="16" y="12" width="32" height="40" rx="6" fill="#F7F9F8"/>
+  <rect x="20" y="16" width="24" height="10" rx="2.5" fill="#1A1A1A"/>
+  <circle cx="24" cy="34" r="2.4" fill="#0B6E4F"/>
+  <circle cx="32" cy="34" r="2.4" fill="#0B6E4F"/>
+  <circle cx="40" cy="34" r="2.4" fill="#0B6E4F"/>
+  <circle cx="24" cy="42" r="2.4" fill="#0B6E4F"/>
+  <circle cx="32" cy="42" r="2.4" fill="#0B6E4F"/>
+  <rect x="37.5" y="39.5" width="5" height="8" rx="2" fill="#F4A259"/>
+</svg>
