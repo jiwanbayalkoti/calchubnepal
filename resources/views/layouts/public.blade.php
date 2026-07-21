@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0B6E4F">
 
+    @include('partials.gtag')
     @include('partials.seo-meta')
 
     {{-- Google Fonts --}}
