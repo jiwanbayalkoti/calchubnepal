@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             CalculatorSeeder::class,
             CatalogExpansionSeeder::class,
             BlogSeeder::class,
+            TopCalculatorBlogSeeder::class,
             AdvertisementSeeder::class,
             SeoPageSeeder::class,
         ]);
