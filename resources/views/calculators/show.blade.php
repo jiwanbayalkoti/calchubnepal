@@ -193,6 +193,30 @@
                         </a>
                     </div>
 
+                    <div class="card-surface p-3 mb-3">
+                        <h6 class="text-uppercase small fw-bold text-muted-custom mb-2">Feedback</h6>
+                        <p class="small text-muted-custom mb-3">Was this calculator helpful? Tell us in a sentence.</p>
+                        <form class="js-feedback-form" action="{{ route('feedback.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="type" value="calculator">
+                            <input type="hidden" name="calculator_id" value="{{ $calculator->id }}">
+                            <div class="mb-2">
+                                <select name="rating" class="form-select form-select-sm">
+                                    <option value="">Rating (optional)</option>
+                                    @for ($i = 5; $i >= 1; $i--)
+                                        <option value="{{ $i }}">{{ $i }} / 5</option>
+                                    @endfor
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="mb-2">
+                                <textarea name="message" rows="3" class="form-control form-control-sm" required maxlength="5000" placeholder="Your feedback…"></textarea>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-outline-brand w-100">Send feedback</button>
+                        </form>
+                    </div>
+
                     @if($calculator->is_premium)
                         <div class="card-surface p-3 border" style="border-color: rgba(var(--accent-rgb), .4) !important;">
                             <span class="badge-soft-accent mb-2 d-inline-block">Premium</span>

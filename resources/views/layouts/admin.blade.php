@@ -70,6 +70,25 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown" id="adminNotificationsDropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false" title="Notifications">
+                    <i class="far fa-bell"></i>
+                    <span class="badge badge-warning navbar-badge d-none" id="adminNotifBadge">0</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="min-width: 320px;">
+                    <span class="dropdown-item dropdown-header d-flex justify-content-between align-items-center">
+                        <span id="adminNotifHeader">Notifications</span>
+                        <button type="button" class="btn btn-xs btn-link p-0" id="adminNotifMarkAll">Mark all read</button>
+                    </span>
+                    <div class="dropdown-divider"></div>
+                    <div id="adminNotifList" style="max-height: 360px; overflow-y: auto;">
+                        <span class="dropdown-item text-muted text-sm">Loading…</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="{{ route('admin.notifications.index') }}" class="dropdown-item dropdown-footer">View all notifications</a>
+                </div>
+            </li>
+
             <li class="nav-item">
                 <a class="nav-link" href="#" id="darkModeToggle" title="Toggle dark mode">
                     <i class="fas fa-moon"></i>
@@ -190,6 +209,12 @@
                     </li>
 
                     <li class="nav-header">SUPPORT</li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.notifications.index') }}" class="nav-link {{ str($current)->startsWith('admin.notifications') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-bell"></i>
+                            <p>Notifications</p>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ route('admin.feedback.index') }}" class="nav-link {{ str($current)->startsWith('admin.feedback') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-comment-dots"></i>
@@ -323,6 +348,76 @@
             const isDark = $('body').toggleClass('dark-mode').hasClass('dark-mode');
             document.cookie = 'admin_dark_mode=' + (isDark ? '1' : '0') + ';path=/;max-age=' + 60 * 60 * 24 * 365;
         });
+
+        const notifRoutes = {
+            recent: @json(route('admin.notifications.recent')),
+            markAll: @json(route('admin.notifications.read-all')),
+            markRead: @json(route('admin.notifications.read', ['id' => '__ID__'])),
+        };
+
+        function updateNotifBadge(count) {
+            const $badge = $('#adminNotifBadge');
+            if (count > 0) {
+                $badge.text(count > 99 ? '99+' : count).removeClass('d-none');
+                $('#adminNotifHeader').text(count + ' new notification' + (count === 1 ? '' : 's'));
+            } else {
+                $badge.addClass('d-none').text('0');
+                $('#adminNotifHeader').text('Notifications');
+            }
+        }
+
+        function renderNotifications(items) {
+            const $list = $('#adminNotifList').empty();
+            if (!items.length) {
+                $list.append('<span class="dropdown-item text-muted text-sm">No notifications yet.</span>');
+                return;
+            }
+            items.forEach(function (n) {
+                const unreadClass = n.is_unread ? 'font-weight-bold' : 'text-muted';
+                const bg = n.is_unread ? 'style="background:#fff8e6;"' : '';
+                $list.append(
+                    '<a href="' + n.url + '" class="dropdown-item admin-notif-item ' + unreadClass + '" data-id="' + n.id + '" ' + bg + '>' +
+                        '<div class="media">' +
+                            '<div class="mr-2 mt-1"><i class="' + (n.icon || 'fas fa-bell') + ' text-primary"></i></div>' +
+                            '<div class="media-body">' +
+                                '<div class="text-sm">' + $('<div>').text(n.title).html() + '</div>' +
+                                '<div class="text-xs text-muted text-truncate" style="max-width:240px;">' + $('<div>').text(n.body || '').html() + '</div>' +
+                                '<span class="text-xs text-muted"><i class="far fa-clock mr-1"></i>' + $('<div>').text(n.created_at || '').html() + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</a><div class="dropdown-divider m-0"></div>'
+                );
+            });
+        }
+
+        function loadAdminNotifications() {
+            $.getJSON(notifRoutes.recent)
+                .done(function (res) {
+                    updateNotifBadge(res.unread || 0);
+                    renderNotifications(res.data || []);
+                });
+        }
+
+        $('#adminNotificationsDropdown').on('show.bs.dropdown', loadAdminNotifications);
+
+        $(document).on('click', '.admin-notif-item', function () {
+            const id = $(this).data('id');
+            if (!id) return;
+            $.post(notifRoutes.markRead.replace('__ID__', id));
+        });
+
+        $('#adminNotifMarkAll').on('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $.post(notifRoutes.markAll).done(function () {
+                updateNotifBadge(0);
+                loadAdminNotifications();
+                toastr.success('All notifications marked as read.');
+            });
+        });
+
+        loadAdminNotifications();
+        setInterval(loadAdminNotifications, 60000);
 
         @if(session('success'))
             toastr.success(@json(session('success')));

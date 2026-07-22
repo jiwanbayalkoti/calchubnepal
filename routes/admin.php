@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FeedbackController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SeoPageController;
 use App\Http\Controllers\Admin\SettingController;
@@ -31,6 +32,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 
     Route::get('calculators/data', [CalculatorController::class, 'data'])->name('calculators.data');
     Route::patch('calculators/{id}/toggle-active', [CalculatorController::class, 'toggleActive'])->name('calculators.toggle-active');

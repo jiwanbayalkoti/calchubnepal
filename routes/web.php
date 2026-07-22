@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\Account\SubscriptionController as AccountSubscripti
 use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\CalculatorController;
 use App\Http\Controllers\Web\CategoryController;
+use App\Http\Controllers\Web\FeedbackController;
 use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\LocaleController;
 use App\Http\Controllers\Web\PageController;
@@ -56,6 +57,10 @@ Route::post('/contact', [PageController::class, 'contactStore'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
 
+Route::post('/feedback', [FeedbackController::class, 'store'])
+    ->middleware('throttle:8,1')
+    ->name('feedback.store');
+
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms');
 Route::get('/cookie-policy', [PageController::class, 'cookies'])->name('cookies');
@@ -95,6 +100,9 @@ Route::middleware(['auth', 'verified'])->prefix('account')->name('account.')->gr
     Route::delete('/saved/{saved}', [AccountSavedCalculationController::class, 'destroy'])->name('saved.destroy');
 
     Route::get('/subscription', [AccountSubscriptionController::class, 'index'])->name('subscription');
+    Route::post('/subscription/interest', [AccountSubscriptionController::class, 'requestPlan'])
+        ->middleware('throttle:5,1')
+        ->name('subscription.interest');
 });
 
 Route::get('/dashboard', fn () => redirect()->route('account.dashboard'))

@@ -10,10 +10,13 @@ use App\Models\CalculatorCategory;
 use App\Models\ContactMessage;
 use App\Models\SeoPage;
 use App\Models\SubscriptionPlan;
+use App\Notifications\Admin\ContactMessageReceived;
 use App\Services\Activity\ActivityLogService;
+use App\Services\Admin\AdminNotifier;
 use App\Services\Seo\SeoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class PageController extends Controller
@@ -21,18 +24,30 @@ class PageController extends Controller
     public function __construct(
         protected SeoService $seo,
         protected ActivityLogService $activity,
+        protected AdminNotifier $notifier,
     ) {
     }
 
     public function about(): View
     {
+        $stats = Cache::remember('calc_hub:about:stats', 3600, function () {
+            return [
+                'calculators' => Calculator::query()->where('is_active', true)->count(),
+                'categories' => CalculatorCategory::query()->where('is_active', true)->count(),
+                'guides' => BlogPost::query()->published()->count(),
+            ];
+        });
+
         $meta = $this->seo->buildMeta(null, [
-            'title' => 'About Us — AI Calculator Hub',
-            'description' => 'Learn about AI Calculator Hub — our mission to make accurate, AI-assisted calculators free and accessible for everyone.',
+            'title' => __('about.meta_title'),
+            'description' => __('about.meta_description'),
             'canonical' => route('about'),
         ]);
 
-        return view('pages.about', ['meta' => $meta]);
+        return view('pages.about', [
+            'meta' => $meta,
+            'stats' => $stats,
+        ]);
     }
 
     public function pricing(): View
@@ -68,8 +83,9 @@ class PageController extends Controller
         $message = ContactMessage::create($data);
 
         $this->activity->log('created', 'contact_message', $message, ['subject' => $message->subject]);
+        $this->notifier->notify(new ContactMessageReceived($message));
 
-        if ($request->wantsJson()) {
+        if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'message' => "Thanks for reaching out! We'll get back to you shortly.",
             ]);

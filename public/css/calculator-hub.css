@@ -2239,3 +2239,50 @@ html[data-theme='dark'] .account-dropdown {
   .hero-section { padding: 3.5rem 0 2.5rem; }
   .toc-box { position: static; }
 }
+
+/* ==========================================================================
+   About page
+   ========================================================================== */
+
+.about-stat__value {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: var(--brand);
+  line-height: 1.1;
+  margin-bottom: 0.35rem;
+}
+
+html[data-theme='dark'] .about-stat__value {
+  color: var(--accent);
+}
+
+.about-stat__label {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.about-coverage li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.about-coverage li:last-child {
+  border-bottom: 0;
+}
+
+.about-coverage li i {
+  color: var(--brand);
+  font-size: 1.1rem;
+  width: 1.25rem;
+  text-align: center;
+}
+
+html[data-theme='dark'] .about-coverage li i {
+  color: var(--accent);
+}

@@ -51,9 +51,15 @@
                             @endforeach
                         </ul>
                     @endif
-                    <a href="{{ route('pricing') }}" class="btn btn-sm {{ $plan->isFree() ? 'btn-soft' : 'btn-outline-brand' }}">
-                        {{ $plan->isFree() ? 'Current free tier' : 'Choose plan' }}
-                    </a>
+                    @if ($plan->isFree())
+                        <span class="btn btn-sm btn-soft disabled">Current free tier</span>
+                    @else
+                        <form action="{{ route('account.subscription.interest') }}" method="POST" class="js-plan-interest-form mt-auto">
+                            @csrf
+                            <input type="hidden" name="subscription_plan_id" value="{{ $plan->id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-brand w-100">Request this plan</button>
+                        </form>
+                    @endif
                 </div>
             </div>
         @empty

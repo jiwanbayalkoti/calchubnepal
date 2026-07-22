@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\Admin\UserRegistered;
 use App\Services\Activity\ActivityLogService;
+use App\Services\Admin\AdminNotifier;
 use GuzzleHttp\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -18,8 +20,10 @@ use Throwable;
 
 class GoogleAuthController extends Controller
 {
-    public function __construct(protected ActivityLogService $activityLog)
-    {
+    public function __construct(
+        protected ActivityLogService $activityLog,
+        protected AdminNotifier $notifier,
+    ) {
     }
 
     public function redirect(): RedirectResponse
@@ -52,8 +56,10 @@ class GoogleAuthController extends Controller
             return $this->fail('Google did not return a valid email address.');
         }
 
+        $isNewUser = false;
+
         try {
-            $user = DB::transaction(function () use ($googleUser, $email, $googleId) {
+            $user = DB::transaction(function () use ($googleUser, $email, $googleId, &$isNewUser) {
                 $user = User::query()->where('google_id', $googleId)->first()
                     ?? User::query()->where('email', $email)->first();
 
@@ -73,6 +79,8 @@ class GoogleAuthController extends Controller
                     return $user->fresh();
                 }
 
+                $isNewUser = true;
+
                 return User::query()->create([
                     'name' => $googleUser->getName() ?: Str::before($email, '@'),
                     'email' => $email,
@@ -90,6 +98,10 @@ class GoogleAuthController extends Controller
             report($e);
 
             return $this->fail('Could not create your account from Google. Please try again.');
+        }
+
+        if ($isNewUser) {
+            $this->notifier->notify(new UserRegistered($user, 'google'));
         }
 
         if (! $user->is_active) {

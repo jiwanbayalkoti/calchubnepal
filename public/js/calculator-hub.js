@@ -597,6 +597,98 @@
   });
 
   /* ------------------------------------------------------------------ */
+  /* Feedback form (AJAX)                                                */
+  /* ------------------------------------------------------------------ */
+
+  $(document).on('submit', '.js-feedback-form', function (e) {
+    e.preventDefault();
+
+    const $form = $(this);
+    const $submit = $form.find('[type="submit"]');
+
+    clearErrors($form);
+    $submit.prop('disabled', true);
+
+    $.ajax({
+      url: $form.attr('action'),
+      method: 'POST',
+      data: $form.serialize(),
+      dataType: 'json',
+    })
+      .done(function (response) {
+        if (window.Swal) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Thanks!',
+            text: response.message,
+            confirmButtonColor: '#0B6E4F',
+          });
+        } else if (window.toastr) {
+          toastr.success(response.message);
+        } else {
+          alert(response.message || 'Thanks for your feedback!');
+        }
+        $form[0].reset();
+      })
+      .fail(function (xhr) {
+        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+          showErrors($form, xhr.responseJSON.errors);
+        } else if (window.toastr) {
+          toastr.error('Unable to send feedback. Please try again.');
+        } else {
+          alert('Unable to send feedback. Please try again.');
+        }
+      })
+      .always(function () {
+        $submit.prop('disabled', false);
+      });
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Plan interest (AJAX)                                                */
+  /* ------------------------------------------------------------------ */
+
+  $(document).on('submit', '.js-plan-interest-form', function (e) {
+    e.preventDefault();
+
+    const $form = $(this);
+    const $submit = $form.find('[type="submit"]');
+    $submit.prop('disabled', true);
+
+    $.ajax({
+      url: $form.attr('action'),
+      method: 'POST',
+      data: $form.serialize(),
+      dataType: 'json',
+    })
+      .done(function (response) {
+        if (window.Swal) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Request received',
+            text: response.message,
+            confirmButtonColor: '#0B6E4F',
+          });
+        } else if (window.toastr) {
+          toastr.success(response.message);
+        } else {
+          alert(response.message || 'Request sent.');
+        }
+      })
+      .fail(function (xhr) {
+        const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Could not send plan request.';
+        if (window.toastr) {
+          toastr.error(msg);
+        } else {
+          alert(msg);
+        }
+      })
+      .always(function () {
+        $submit.prop('disabled', false);
+      });
+  });
+
+  /* ------------------------------------------------------------------ */
   /* Favorite toggle                                                     */
   /* ------------------------------------------------------------------ */
 

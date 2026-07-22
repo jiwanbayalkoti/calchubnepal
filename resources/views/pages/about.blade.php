@@ -1,68 +1,111 @@
 @extends('layouts.public')
 
 @section('content')
-    <section class="hero-section atmosphere text-center">
-        <div class="container position-relative" style="z-index:2;">
-            <span class="hero-eyebrow"><i class="bi bi-info-circle"></i> About Us</span>
-            <h1 class="hero-title mx-auto" style="font-size: clamp(2rem, 4vw, 3rem);">Calculators built for clarity.</h1>
-            <p class="hero-subtitle">AI Calculator Hub is an independent tools platform that helps people make better everyday decisions with transparent formulas, worked examples and optional AI explanations.</p>
+    <section class="hero-section atmosphere">
+        <div class="atmosphere-shape" style="width:420px;height:420px;background:var(--brand);top:-140px;left:-120px;"></div>
+        <div class="atmosphere-shape" style="width:300px;height:300px;background:var(--accent);top:60px;right:-80px;"></div>
+
+        <div class="container position-relative text-center" style="z-index:2;">
+            <span class="hero-eyebrow"><i class="bi bi-info-circle"></i> {{ __('about.eyebrow') }}</span>
+            <h1 class="hero-title mx-auto" style="font-size: clamp(2rem, 4vw, 3rem);">{{ __('about.hero_title') }}</h1>
+            <p class="hero-subtitle mx-auto">{{ __('about.hero_subtitle') }}</p>
         </div>
     </section>
 
     <section class="section pt-0">
         <div class="container">
-            <div class="row g-4 mb-5">
-                <div class="col-lg-8">
-                    <div class="card-surface p-4 p-md-5">
-                        <h2 class="h4 mb-3">Who we are</h2>
-                        <p class="text-muted-custom">AI Calculator Hub was created to solve a simple problem: most online calculators show a number without explaining the method, units or assumptions. We build free calculators for construction, finance, health, education, Nepal-specific needs and more — each with clear inputs, formulas and FAQs so you can trust the result.</p>
-                        <p class="text-muted-custom mb-0">We operate from Kathmandu, Nepal, and serve users worldwide. Whether you are estimating materials for a build, planning a loan EMI, checking BMI, or converting land units, our goal is the same: accurate tools, plain language, and no unnecessary friction.</p>
+            <div class="row g-3 g-lg-4 mb-5 about-stats">
+                <div class="col-md-4">
+                    <div class="about-stat card-surface p-4 text-center h-100">
+                        <div class="about-stat__value">{{ number_format($stats['calculators']) }}+</div>
+                        <div class="about-stat__label">{{ __('about.stat_calculators') }}</div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="card-surface p-4 h-100">
-                        <h2 class="h5 mb-3">At a glance</h2>
-                        <ul class="list-unstyled text-muted-custom mb-0">
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-brand me-2"></i>180+ free calculators</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-brand me-2"></i>Guides &amp; worked examples</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-brand me-2"></i>Optional AI explanations</li>
-                            <li class="mb-2"><i class="bi bi-check-circle-fill text-brand me-2"></i>Save &amp; favorite tools</li>
-                            <li class="mb-0"><i class="bi bi-check-circle-fill text-brand me-2"></i>Privacy-first accounts</li>
+                <div class="col-md-4">
+                    <div class="about-stat card-surface p-4 text-center h-100">
+                        <div class="about-stat__value">{{ number_format($stats['categories']) }}</div>
+                        <div class="about-stat__label">{{ __('about.stat_categories') }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="about-stat card-surface p-4 text-center h-100">
+                        <div class="about-stat__value">{{ number_format($stats['guides']) }}+</div>
+                        <div class="about-stat__label">{{ __('about.stat_guides') }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5 align-items-stretch">
+                <div class="col-lg-7">
+                    <div class="card-surface p-4 p-md-5 h-100">
+                        <span class="eyebrow">{{ __('about.who_eyebrow') }}</span>
+                        <h2 class="h3 mb-3">{{ __('about.who_title') }}</h2>
+                        <p class="text-muted-custom">{{ __('about.who_p1') }}</p>
+                        <p class="text-muted-custom mb-0">{{ __('about.who_p2') }}</p>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card-surface p-4 p-md-5 h-100">
+                        <h2 class="h5 mb-3">{{ __('about.coverage_title') }}</h2>
+                        <ul class="about-coverage list-unstyled mb-0">
+                            <li><i class="bi bi-cash-coin"></i> {{ __('about.cov_finance') }}</li>
+                            <li><i class="bi bi-bricks"></i> {{ __('about.cov_construction') }}</li>
+                            <li><i class="bi bi-sun"></i> {{ __('about.cov_climate') }}</li>
+                            <li><i class="bi bi-receipt"></i> {{ __('about.cov_tax') }}</li>
+                            <li><i class="bi bi-car-front"></i> {{ __('about.cov_auto') }}</li>
+                            <li><i class="bi bi-lightning-charge"></i> {{ __('about.cov_productivity') }}</li>
+                            <li><i class="bi bi-heart-pulse"></i> {{ __('about.cov_health') }}</li>
+                            <li><i class="bi bi-flag"></i> {{ __('about.cov_nepal') }}</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-4 mb-5">
+            <div class="section-heading mb-4">
+                <span class="eyebrow">{{ __('about.values_eyebrow') }}</span>
+                <h2>{{ __('about.values_title') }}</h2>
+            </div>
+
+            <div class="row g-3 g-lg-4 mb-5">
                 <div class="col-md-4">
-                    <div class="card-surface p-4 h-100">
-                        <span class="calc-icon mb-3"><i class="bi bi-bullseye"></i></span>
-                        <h3 class="h5">Our mission</h3>
-                        <p class="text-muted-custom mb-0">Make accurate, transparent calculations free and accessible — so students, homeowners, builders and professionals can decide with confidence.</p>
-                    </div>
+                    <article class="how-to-card">
+                        <div class="how-to-card__icons">
+                            <span class="how-to-card__glyph" aria-hidden="true"><i class="bi bi-bullseye"></i></span>
+                        </div>
+                        <h3>{{ __('about.mission_title') }}</h3>
+                        <p>{{ __('about.mission_body') }}</p>
+                    </article>
                 </div>
                 <div class="col-md-4">
-                    <div class="card-surface p-4 h-100">
-                        <span class="calc-icon mb-3"><i class="bi bi-journal-text"></i></span>
-                        <h3 class="h5">How we build</h3>
-                        <p class="text-muted-custom mb-0">Each tool documents its approach, common inputs and FAQs. We prefer standard industry methods and update tools when formulas or local rules change.</p>
-                    </div>
+                    <article class="how-to-card">
+                        <div class="how-to-card__icons">
+                            <span class="how-to-card__glyph" aria-hidden="true"><i class="bi bi-journal-text"></i></span>
+                        </div>
+                        <h3>{{ __('about.build_title') }}</h3>
+                        <p>{{ __('about.build_body') }}</p>
+                    </article>
                 </div>
                 <div class="col-md-4">
-                    <div class="card-surface p-4 h-100">
-                        <span class="calc-icon mb-3"><i class="bi bi-shield-check"></i></span>
-                        <h3 class="h5">Trust &amp; advertising</h3>
-                        <p class="text-muted-custom mb-0">We may show ads (including Google AdSense) to keep tools free. Ads never change calculator math. See our <a href="{{ route('privacy') }}">Privacy</a> and <a href="{{ route('cookies') }}">Cookie</a> policies.</p>
-                    </div>
+                    <article class="how-to-card">
+                        <div class="how-to-card__icons">
+                            <span class="how-to-card__glyph" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+                        </div>
+                        <h3>{{ __('about.trust_title') }}</h3>
+                        <p>{!! __('about.trust_body', [
+                            'privacy' => '<a href="'.e(route('privacy')).'">'.e(__('footer.privacy')).'</a>',
+                            'cookies' => '<a href="'.e(route('cookies')).'">'.e(__('footer.cookies')).'</a>',
+                        ]) !!}</p>
+                    </article>
                 </div>
             </div>
 
             <div class="card-surface p-4 p-md-5">
-                <h2 class="h4 mb-3">Editorial standards</h2>
-                <p class="text-muted-custom">Calculator outputs are informational. They are not a substitute for licensed engineering, medical, legal, tax or financial advice. When a decision is high-stakes, verify with a qualified professional in your jurisdiction.</p>
-                <p class="text-muted-custom mb-4">Found an error or have a tool request? We welcome feedback — it helps us improve accuracy for everyone.</p>
-                <a href="{{ route('contact') }}" class="btn btn-brand me-2">Contact us</a>
-                <a href="{{ route('calculators.index') }}" class="btn btn-outline-brand">Browse calculators</a>
+                <h2 class="h4 mb-3">{{ __('about.standards_title') }}</h2>
+                <p class="text-muted-custom">{{ __('about.standards_p1') }}</p>
+                <p class="text-muted-custom mb-4">{{ __('about.standards_p2') }}</p>
+                <a href="{{ route('contact') }}" class="btn btn-brand me-2">{{ __('about.cta_contact') }}</a>
+                <a href="{{ route('calculators.index') }}" class="btn btn-outline-brand me-2">{{ __('about.cta_browse') }}</a>
+                <a href="{{ route('blog.index') }}" class="btn btn-outline-brand">{{ __('about.cta_blog') }}</a>
             </div>
         </div>
     </section>

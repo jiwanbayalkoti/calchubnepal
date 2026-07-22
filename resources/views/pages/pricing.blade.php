@@ -31,7 +31,19 @@
                                     <li><i class="bi bi-check-circle-fill"></i> {{ $feature }}</li>
                                 @endforeach
                             </ul>
-                            <button type="button" class="btn {{ $index === 1 ? 'btn-brand' : 'btn-outline-brand' }} w-100 js-open-auth" data-auth="register">Get Started</button>
+                            @auth
+                                @if ($plan->isFree())
+                                    <a href="{{ route('account.subscription') }}" class="btn {{ $index === 1 ? 'btn-brand' : 'btn-outline-brand' }} w-100">Go to account</a>
+                                @else
+                                    <form action="{{ route('account.subscription.interest') }}" method="POST" class="js-plan-interest-form">
+                                        @csrf
+                                        <input type="hidden" name="subscription_plan_id" value="{{ $plan->id }}">
+                                        <button type="submit" class="btn {{ $index === 1 ? 'btn-brand' : 'btn-outline-brand' }} w-100">Request {{ $plan->name }}</button>
+                                    </form>
+                                @endif
+                            @else
+                                <button type="button" class="btn {{ $index === 1 ? 'btn-brand' : 'btn-outline-brand' }} w-100 js-open-auth" data-auth="register">Get Started</button>
+                            @endauth
                         </div>
                     </div>
                 @empty

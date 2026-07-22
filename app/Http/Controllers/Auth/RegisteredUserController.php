@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\Admin\UserRegistered;
+use App\Services\Admin\AdminNotifier;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +18,10 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(protected AdminNotifier $notifier)
+    {
+    }
+
     /**
      * Display the registration view (full page fallback / redirect to modal on home).
      */
@@ -48,6 +54,7 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
+        $this->notifier->notify(new UserRegistered($user, 'email'));
 
         Auth::login($user);
 

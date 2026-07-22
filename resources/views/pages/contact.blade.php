@@ -50,6 +50,42 @@
                             </div>
                         </form>
                     </div>
+
+                    <div class="card-surface p-4 p-md-5 mt-4">
+                        <h2 class="h5 mb-1">Quick feedback</h2>
+                        <p class="text-muted-custom small mb-3">Report a bug, request a feature, or share a short note. This goes to the admin inbox — not the contact mailbox.</p>
+                        <form class="js-feedback-form row g-3" action="{{ route('feedback.store') }}" method="POST">
+                            @csrf
+                            <div class="col-md-6">
+                                <label class="form-label">Type</label>
+                                <select name="type" class="form-select">
+                                    <option value="general">General</option>
+                                    <option value="bug">Bug</option>
+                                    <option value="feature">Feature request</option>
+                                    <option value="calculator">Calculator</option>
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Rating (optional)</label>
+                                <select name="rating" class="form-select">
+                                    <option value="">—</option>
+                                    @for ($i = 5; $i >= 1; $i--)
+                                        <option value="{{ $i }}">{{ $i }} star{{ $i > 1 ? 's' : '' }}</option>
+                                    @endfor
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Your feedback</label>
+                                <textarea name="message" rows="4" class="form-control" required maxlength="5000"></textarea>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-outline-brand"><i class="bi bi-chat-dots me-1"></i> Send feedback</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="col-lg-4">
