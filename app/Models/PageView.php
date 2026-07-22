@@ -20,6 +20,7 @@ class PageView extends Model
         'country',
         'device',
         'ip_hash',
+        'ip_truncated',
         'session_id',
     ];
 

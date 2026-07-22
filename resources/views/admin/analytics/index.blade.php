@@ -163,6 +163,100 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card card-outline card-warning">
+                <div class="card-header">
+                    <h3 class="card-title">Countries · Last 30 Days</h3>
+                </div>
+                <div class="card-body p-0" style="max-height:420px; overflow-y:auto;">
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th class="text-right">Views</th>
+                                <th class="text-right">Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($countryRows as $row)
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-light border mr-1">{{ $row->code }}</span>
+                                        {{ $row->name }}
+                                    </td>
+                                    <td class="text-right">{{ number_format($row->views) }}</td>
+                                    <td class="text-right">{{ $row->share }}%</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-muted p-3">
+                                        No country data yet. New visits record country from CDN headers
+                                        (Cloudflare <code>CF-IPCountry</code>, etc.).
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                @if($unknownCountryViews > 0)
+                    <div class="card-footer text-muted small">
+                        {{ number_format($unknownCountryViews) }} views in the last 30 days have no country
+                        (local/dev or missing proxy geo header).
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card card-outline card-dark">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Visits · 7 Days</h3>
+                    <div class="card-tools">
+                        <span class="badge badge-secondary">IP truncated · admin only</span>
+                    </div>
+                </div>
+                <div class="card-body p-0" style="max-height:420px; overflow-y:auto;">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>Path</th>
+                                <th>Country</th>
+                                <th>Device</th>
+                                <th>IP (truncated)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($recentVisits as $visit)
+                                <tr>
+                                    <td class="text-nowrap">{{ $visit->created_at?->format('M d H:i') }}</td>
+                                    <td><code class="small">{{ \Illuminate\Support\Str::limit($visit->path, 40) }}</code></td>
+                                    <td>
+                                        @if($visit->country)
+                                            <span class="badge badge-light border">{{ $visit->country }}</span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-capitalize">{{ $visit->device ?: '—' }}</td>
+                                    <td><code class="small">{{ $visit->ip_truncated ?: '—' }}</code></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-muted p-3">No recent visits recorded.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-muted small">
+                    Truncated IPs (IPv4 /24) are stored server-side for abuse review only — not shared with AdSense
+                    or used for ad personalization.
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')

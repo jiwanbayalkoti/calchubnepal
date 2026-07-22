@@ -12,6 +12,25 @@ class BlogPostRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('is_featured')) {
+            $this->merge([
+                'is_featured' => filter_var($this->input('is_featured'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+            ]);
+        }
+
+        $tags = $this->input('tags');
+
+        if (is_string($tags)) {
+            $this->merge([
+                'tags' => array_values(array_filter(array_map('trim', explode(',', $tags)))),
+            ]);
+        } elseif ($tags === null || $tags === '') {
+            $this->merge(['tags' => []]);
+        }
+    }
+
     /**
      * @return array<string, mixed>
      */
