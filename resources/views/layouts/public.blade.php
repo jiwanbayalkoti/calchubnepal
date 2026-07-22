@@ -24,8 +24,8 @@
     {{-- Toastr --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
 
-    {{-- App design system --}}
-    <link rel="stylesheet" href="{{ asset('css/calculator-hub.css') }}">
+    {{-- App design system (filemtime busts CDN/browser cache after CSS updates) --}}
+    <link rel="stylesheet" href="{{ asset('css/calculator-hub.css') }}?v={{ @filemtime(public_path('css/calculator-hub.css')) ?: '1' }}">
 
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
@@ -229,7 +229,7 @@
 <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script src="{{ asset('js/calculator-hub.js') }}"></script>
+<script src="{{ asset('js/calculator-hub.js') }}?v={{ @filemtime(public_path('js/calculator-hub.js')) ?: '1' }}"></script>
 
 @stack('scripts')
 </body>
