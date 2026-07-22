@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Web;
 use App\Contracts\Services\CalculatorServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
+use App\Models\Calculator;
 use App\Models\CalculatorCategory;
 use App\Services\Seo\SeoService;
 use App\Services\Settings\AppSettings;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -41,6 +43,13 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
+        $catalogCounts = Cache::remember('calc_hub:home:catalog_counts', 3600, function () {
+            return [
+                'calculators' => Calculator::query()->where('is_active', true)->count(),
+                'categories' => CalculatorCategory::query()->active()->count(),
+            ];
+        });
+
         $meta = $this->seo->buildMeta(null, [
             'title' => $this->hub->homeTitle(),
             'description' => $this->hub->homeDescription(),
@@ -52,6 +61,8 @@ class HomeController extends Controller
             'popularCalculators' => $popular,
             'categories' => $categories,
             'latestPosts' => $latestPosts,
+            'calculatorCount' => $catalogCounts['calculators'],
+            'categoryCount' => $catalogCounts['categories'],
         ]);
     }
 }

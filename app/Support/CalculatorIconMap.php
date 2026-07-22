@@ -31,6 +31,10 @@ class CalculatorIconMap
             'internet-it' => 'bi-laptop',
             'developer' => 'bi-code-slash',
             'nepal' => 'bi-flag',
+            'career' => 'bi-person-badge',
+            'climate-energy' => 'bi-sun',
+            'tax-deductions' => 'bi-receipt',
+            'productivity' => 'bi-lightning-charge',
         ];
     }
 
@@ -202,7 +206,6 @@ class CalculatorIconMap
             'vo2_max_calculator' => 'bi-heart-pulse',
 
             // Home
-            'ac_size_calculator' => 'bi-snow',
             'carpet_area_calculator' => 'bi-bounding-box-circles',
             'curtain_length_calculator' => 'bi-window',
             'electricity_bill_calculator' => 'bi-plug',
@@ -210,13 +213,59 @@ class CalculatorIconMap
             'solar_requirement_calculator' => 'bi-sun-fill',
             'water_bill_calculator' => 'bi-droplet-fill',
 
+            // Climate & Energy
+            'solar_roi_calculator' => 'bi-sun',
+            'backup_power_roi_calculator' => 'bi-battery-charging',
+            'solar_panel_cost_calculator' => 'bi-solar-panel',
+            'ev_vs_ice_tco_calculator' => 'bi-ev-front',
+            'ac_size_calculator' => 'bi-snow',
+            'heat_pump_payback_calculator' => 'bi-thermometer-half',
+            'home_insulation_roi_calculator' => 'bi-house-gear',
+            'whole_home_electrification_bundle_roi_calculator' => 'bi-lightning',
+            'flood_insurance_vs_self_insure_calculator' => 'bi-water',
+            'home_climate_hardening_payback_calculator' => 'bi-shield-check',
+            'wildfire_defensible_space_roi_calculator' => 'bi-tree',
+            'carbon_footprint_true_cost_calculator' => 'bi-globe2',
+            'flight_emissions_offset_calculator' => 'bi-airplane',
+            'electricity_bill_optimizer_tou_calculator' => 'bi-graph-up-arrow',
+            'climate_migration_cost_calculator' => 'bi-geo-alt',
+
+            // Tax & Deductions
+            'kids_529_vs_utma_vs_roth_calculator' => 'bi-mortarboard',
+            'multi_state_remote_work_tax_exposure_calculator' => 'bi-geo',
+            'hsa_triple_tax_optimizer_calculator' => 'bi-heart-pulse',
+            'bonus_tax_calculator' => 'bi-cash-stack',
+            'mega_backdoor_roth_calculator' => 'bi-door-open',
+            'backdoor_roth_pro_rata_trap_calculator' => 'bi-exclamation-triangle',
+            'property_tax_calculator' => 'bi-house',
+            'quarterly_estimated_tax_calculator' => 'bi-calendar4',
+            'dependent_care_fsa_vs_child_tax_credit_calculator' => 'bi-people',
+            'capital_gains_tax_calculator' => 'bi-graph-up',
+            'after_tax_income_calculator' => 'bi-wallet2',
+            'rsu_tax_withholding_shortfall_calculator' => 'bi-pie-chart',
+            'stock_options_iso_nso_amt_calculator' => 'bi-bar-chart-steps',
+            'tax_bracket_calculator' => 'bi-layers',
+            'digital_nomad_tax_residency_optimizer_calculator' => 'bi-globe',
+
+            // Productivity
+            'compound_habit_calculator' => 'bi-graph-up-arrow',
+            'probability_of_success_calculator' => 'bi-dice-5',
+            'cognitive_load_calculator' => 'bi-cpu',
+            'best_day_to_move_calculator' => 'bi-calendar-check',
+            'decision_fatigue_calculator' => 'bi-battery-half',
+
             // Automobile
+            'auto_refinance_calculator' => 'bi-arrow-repeat',
             'battery_life_calculator' => 'bi-battery-half',
+            'commute_cost_time_calculator' => 'bi-briefcase',
             'ev_charging_calculator' => 'bi-ev-station',
+            'ev_vs_gas_total_cost_calculator' => 'bi-lightning-charge',
             'fuel_cost_calculator' => 'bi-fuel-pump',
+            'lease_vs_buy_car_calculator' => 'bi-shuffle',
             'mileage_calculator' => 'bi-speedometer2',
             'road_trip_cost_calculator' => 'bi-signpost-2',
             'tire_size_calculator' => 'bi-circle',
+            'true_cost_per_mile_calculator' => 'bi-cash-coin',
             'vehicle_speed_calculator' => 'bi-speedometer',
 
             // Agriculture
@@ -227,7 +276,6 @@ class CalculatorIconMap
             'seed_calculator' => 'bi-flower2',
 
             // Real estate
-            'property_tax_calculator' => 'bi-building',
             'rent_calculator' => 'bi-key',
             'rental_yield_calculator' => 'bi-graph-up',
 

@@ -3,6 +3,7 @@
 namespace App\Services\Calculators;
 
 use App\Contracts\Calculators\CalculatorHandlerInterface;
+use App\Models\Calculator;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -37,18 +38,27 @@ class CalculatorRegistry
     {
         $this->discoverIfNeeded();
 
-        return isset($this->handlers[$key]);
+        if (isset($this->handlers[$key])) {
+            return true;
+        }
+
+        // Allow catalog stubs that exist in DB but have no dedicated handler yet.
+        return Calculator::query()->where('formula_key', $key)->where('is_active', true)->exists();
     }
 
     public function get(string $key): CalculatorHandlerInterface
     {
         $this->discoverIfNeeded();
 
-        if (! isset($this->handlers[$key])) {
-            throw new InvalidArgumentException("No calculator handler registered for key [{$key}].");
+        if (isset($this->handlers[$key])) {
+            return $this->handlers[$key];
         }
 
-        return $this->handlers[$key];
+        if (Calculator::query()->where('formula_key', $key)->where('is_active', true)->exists()) {
+            return new DynamicStubHandler($key);
+        }
+
+        throw new InvalidArgumentException("No calculator handler registered for key [{$key}].");
     }
 
     /**

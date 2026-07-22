@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             SubscriptionPlanSeeder::class,
             AiPromptSeeder::class,
             CalculatorSeeder::class,
+            CatalogExpansionSeeder::class,
             BlogSeeder::class,
             AdvertisementSeeder::class,
             SeoPageSeeder::class,

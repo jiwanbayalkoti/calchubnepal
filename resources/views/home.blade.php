@@ -3,28 +3,37 @@
 @section('content')
 
     {{-- ============================================================ --}}
-    {{-- Hero — brand-first, one headline, one sentence, single CTA    --}}
+    {{-- Hero — brand + Try a Quick One widget                         --}}
     {{-- ============================================================ --}}
-    <section class="hero-section atmosphere text-center">
+    <section class="hero-section atmosphere">
         <div class="atmosphere-shape" style="width:420px;height:420px;background:var(--brand);top:-140px;left:-120px;"></div>
         <div class="atmosphere-shape" style="width:340px;height:340px;background:var(--accent);top:40px;right:-100px;"></div>
 
         <div class="container position-relative" style="z-index:2;">
-            <span class="hero-eyebrow"><i class="bi bi-stars"></i> {{ __('home.eyebrow') }}</span>
-            <h1 class="hero-title mx-auto">{{ __('home.hero_title') }}</h1>
-            <p class="hero-subtitle">{{ __('home.hero_subtitle') }}</p>
-            <a href="{{ route('calculators.index') }}" class="btn btn-brand btn-lg">
-                {{ __('home.cta_explore') }} <i class="bi bi-arrow-right ms-1"></i>
-            </a>
+            <div class="row align-items-center g-4 g-xl-5">
+                <div class="col-lg-5 col-xl-6 text-center text-lg-start hero-copy">
+                    <span class="hero-eyebrow"><i class="bi bi-stars"></i> {{ __('home.eyebrow') }}</span>
+                    <h1 class="hero-title">{{ __('home.hero_title') }}</h1>
+                    <p class="hero-subtitle hero-subtitle--left">{{ __('home.hero_subtitle') }}</p>
+                    <a href="{{ route('calculators.index') }}" class="btn btn-brand btn-lg">
+                        {{ __('home.cta_explore') }} <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="col-lg-7 col-xl-6">
+                    @include('partials.home.quick-try')
+                </div>
+            </div>
         </div>
     </section>
 
     @include('partials.ads.header')
 
+    @include('partials.home.how-to-use')
+
     {{-- ============================================================ --}}
     {{-- Popular calculators                                           --}}
     {{-- ============================================================ --}}
-    <section class="section">
+    <section class="section pt-0">
         <div class="container">
             <div class="section-heading d-flex flex-wrap justify-content-between align-items-end">
                 <div>
@@ -111,3 +120,19 @@
     @endif
 
 @endsection
+
+@push('scripts')
+<script>
+(function ($) {
+  $(document).on('click', '.js-focus-home-search', function (e) {
+    const $input = $('.js-live-search').first();
+    if (!$input.length) return;
+    e.preventDefault();
+    $('html, body').animate({ scrollTop: 0 }, 220);
+    setTimeout(function () {
+      $input.trigger('focus');
+    }, 240);
+  });
+})(jQuery);
+</script>
+@endpush

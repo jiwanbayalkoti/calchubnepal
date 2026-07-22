@@ -8,7 +8,12 @@
 @endpush
 
 @push('styles')
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+{{-- CKEditor 5 Classic — free build, no API key --}}
+<style>
+    .ck-editor__editable_inline { min-height: 280px; }
+    .ck.ck-editor { width: 100%; }
+</style>
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
 @endpush
 
 @section('content')
@@ -142,20 +147,53 @@
 @push('scripts')
 <script>
 $(function () {
-    let tinyReady = false;
-    function initEditor() {
-        if (typeof tinymce === 'undefined') return;
-        tinymce.init({
-            selector: '#postContent',
-            height: 320,
-            menubar: false,
-            plugins: 'lists link image code table',
-            toolbar: 'undo redo | bold italic | bullist numlist | link image | code',
-            setup: (editor) => editor.on('change', () => editor.save()),
-        });
-        tinyReady = true;
+    let contentEditor = null;
+
+    function syncEditorToTextarea() {
+        if (contentEditor) {
+            contentEditor.updateSourceElement();
+        }
     }
+
+    function setEditorData(html) {
+        if (contentEditor) {
+            contentEditor.setData(html || '');
+        } else {
+            $('#postContent').val(html || '');
+        }
+    }
+
+    function initEditor() {
+        if (typeof ClassicEditor === 'undefined') {
+            console.error('CKEditor 5 failed to load');
+            return;
+        }
+        if (contentEditor) {
+            return;
+        }
+        ClassicEditor
+            .create(document.querySelector('#postContent'), {
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', 'blockQuote', '|',
+                    'insertTable', '|',
+                    'undo', 'redo',
+                ],
+            })
+            .then((editor) => {
+                contentEditor = editor;
+                editor.model.document.on('change:data', () => editor.updateSourceElement());
+            })
+            .catch((err) => console.error('CKEditor init error', err));
+    }
+
     initEditor();
+
+    // Keep textarea in sync before AJAX serialize
+    $('#postForm').on('submit', function () {
+        syncEditorToTextarea();
+    });
 
     AdminCRUD.initDataTable('#postsTable', {
         ajaxUrl: '{{ route("admin.blog-posts.data") }}',
@@ -187,7 +225,7 @@ $(function () {
     $('#btnAddPost').on('click', function (e) {
         e.preventDefault();
         AdminCRUD.openCreate('#postModal', '#postForm', 'Add Blog Post');
-        if (tinyReady && tinymce.get('postContent')) tinymce.get('postContent').setContent('');
+        setEditorData('');
     });
 
     AdminCRUD.bindForm({
@@ -199,7 +237,7 @@ $(function () {
 
     AdminCRUD.bindEdit('.btn-edit', (id) => `{{ url('admin/blog-posts') }}/${id}`, '#postForm', '#postModal', function (data, formSelector) {
         AdminCRUD.autoFill(formSelector, data);
-        if (tinyReady) tinymce.get('postContent').setContent(data.content || '');
+        setEditorData(data.content || '');
         $('#postModal .modal-title').text('Edit Blog Post');
     });
 
