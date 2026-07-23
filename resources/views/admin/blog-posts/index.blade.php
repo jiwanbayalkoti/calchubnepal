@@ -48,15 +48,15 @@
     </div>
 
     <div class="modal fade" id="postModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <form id="postForm" autocomplete="off">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="max-height: calc(100vh - 3.5rem); display: flex; flex-direction: column;">
+                <form id="postForm" autocomplete="off" style="display: flex; flex-direction: column; min-height: 0; flex: 1;">
                     <input type="hidden" name="id">
-                    <div class="modal-header">
+                    <div class="modal-header flex-shrink-0">
                         <h5 class="modal-title">Blog Post</h5>
                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="overflow-y: auto; flex: 1 1 auto; max-height: calc(100vh - 12rem);">
                         <div class="row">
                             <div class="col-md-8 form-group">
                                 <label>Title <span class="required-star">*</span></label>
@@ -129,12 +129,12 @@
                             <label>Meta Title</label>
                             <input type="text" name="meta_title" class="form-control">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-0">
                             <label>Meta Description</label>
                             <textarea name="meta_description" class="form-control" rows="2"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer flex-shrink-0">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save Post</button>
                     </div>

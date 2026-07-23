@@ -48,6 +48,11 @@
         /* Ensure modal backdrop/stacking works above AdminLTE wrappers */
         .modal-backdrop { z-index: 1040; }
         .modal { z-index: 1050; }
+        /* Bootstrap 4 / AdminLTE: make tall forms scroll inside the modal body */
+        #postModal .modal-body {
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 
     @stack('styles')
