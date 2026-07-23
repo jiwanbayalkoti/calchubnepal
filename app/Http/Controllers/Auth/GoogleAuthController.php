@@ -128,9 +128,7 @@ class GoogleAuthController extends Controller
             'email' => $user->email,
         ]);
 
-        $default = $user->canAccessAdmin()
-            ? route('admin.dashboard', absolute: false)
-            : route('account.dashboard', absolute: false);
+        $default = $user->homePath();
 
         return redirect()->intended($default);
     }

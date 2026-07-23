@@ -150,6 +150,16 @@ class User extends Authenticatable
         return $this->hasMany(CalculationHistory::class);
     }
 
+    public function advertiser(): HasOne
+    {
+        return $this->hasOne(Advertiser::class);
+    }
+
+    public function isAdvertiser(): bool
+    {
+        return $this->hasRole('advertiser') || $this->advertiser()->exists();
+    }
+
     public function apiKeysActive(): HasMany
     {
         return $this->apiKeys()->where('is_active', true);
@@ -166,6 +176,19 @@ class User extends Authenticatable
         return $this->hasRole('super-admin')
             || $this->hasRole('admin')
             || $this->hasPermission('admin.dashboard.view');
+    }
+
+    public function homePath(): string
+    {
+        if ($this->canAccessAdmin()) {
+            return route('admin.dashboard', absolute: false);
+        }
+
+        if ($this->isAdvertiser()) {
+            return route('advertiser.dashboard', absolute: false);
+        }
+
+        return route('account.dashboard', absolute: false);
     }
 
     /**

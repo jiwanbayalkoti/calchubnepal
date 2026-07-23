@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\Account\HistoryController as AccountHistoryControll
 use App\Http\Controllers\Web\Account\ProfileController as AccountProfileController;
 use App\Http\Controllers\Web\Account\SavedCalculationController as AccountSavedCalculationController;
 use App\Http\Controllers\Web\Account\SubscriptionController as AccountSubscriptionController;
+use App\Http\Controllers\Web\AdTrackingController;
 use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\CalculatorController;
 use App\Http\Controllers\Web\CategoryController;
@@ -61,6 +62,12 @@ Route::post('/feedback', [FeedbackController::class, 'store'])
     ->middleware('throttle:8,1')
     ->name('feedback.store');
 
+Route::middleware('throttle:120,1')->group(function () {
+    Route::get('/ads/adsense/impression', [AdTrackingController::class, 'adsenseImpression'])->name('ads.adsense.impression');
+    Route::get('/ads/{id}/impression', [AdTrackingController::class, 'impression'])->name('ads.impression');
+    Route::get('/ads/{id}/click', [AdTrackingController::class, 'click'])->name('ads.click');
+});
+
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms-conditions', [PageController::class, 'terms'])->name('terms');
 Route::get('/cookie-policy', [PageController::class, 'cookies'])->name('cookies');
@@ -115,3 +122,4 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
+require __DIR__.'/advertiser.php';

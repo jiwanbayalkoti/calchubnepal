@@ -26,6 +26,14 @@ class EnsureUserIsAdmin
             || $user->hasPermission('admin.dashboard.view');
 
         if (! $isAdmin) {
+            if ($user->isAdvertiser()) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Use the advertiser portal.', 'redirect' => route('advertiser.dashboard')], 403);
+                }
+
+                return redirect()->route('advertiser.dashboard');
+            }
+
             return $this->deny($request, 403, 'You do not have permission to access the admin panel.');
         }
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\Concerns\BuildsDataTableResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdvertisementRequest;
 use App\Models\Advertisement;
+use App\Models\AdvertisementAssignment;
+use App\Models\Advertiser;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Media\FileUploadService;
 use Illuminate\Http\JsonResponse;
@@ -29,12 +31,13 @@ class AdvertisementController extends Controller
         return view('admin.advertisements.index', [
             'adPositions' => config('calculator_hub.ads.positions', []),
             'maxUploadKb' => (int) config('calculator_hub.ads.max_upload_kb', 1024),
+            'advertisers' => Advertiser::query()->orderBy('company_name')->get(['id', 'company_name']),
         ]);
     }
 
     public function data(Request $request): JsonResponse
     {
-        $query = Advertisement::query();
+        $query = Advertisement::query()->with('advertiser:id,company_name');
 
         return $this->toDataTableResponse(
             $request,
@@ -47,6 +50,10 @@ class AdvertisementController extends Controller
                     'name' => $ad->name,
                     'position' => $ad->position,
                     'ad_type' => $ad->ad_type,
+                    'advertiser' => $ad->advertiser?->company_name,
+                    'advertiser_id' => $ad->advertiser_id,
+                    'banner_size' => $ad->banner_size,
+                    'status' => $ad->status,
                     'is_active' => (bool) $ad->is_active,
                     'impressions' => $ad->impressions,
                     'clicks' => $ad->clicks,
@@ -62,10 +69,27 @@ class AdvertisementController extends Controller
         $data = $this->payloadFromRequest($request);
         $data['slug'] = $data['slug'] ?? Str::slug($data['name']).'-'.Str::random(4);
         $data['is_active'] = $data['is_active'] ?? true;
+        $data['status'] = $data['status'] ?? ($data['is_active'] ? Advertisement::STATUS_ACTIVE : Advertisement::STATUS_PAUSED);
         $data['created_by'] = $request->user()?->id;
         $data['image'] = $this->resolveImagePath($request);
 
+        if (! empty($data['advertiser_id'])) {
+            $data['assigned_by'] = $request->user()?->id;
+            $data['assigned_at'] = now();
+            $data['banner_size'] = $data['banner_size']
+                ?? data_get(config('calculator_hub.ads.positions'), $data['position'].'.size_label');
+        }
+
         $ad = Advertisement::create($data);
+
+        if ($ad->advertiser_id) {
+            AdvertisementAssignment::query()->create([
+                'advertisement_id' => $ad->id,
+                'advertiser_id' => $ad->advertiser_id,
+                'assigned_by' => $request->user()?->id,
+                'assigned_at' => now(),
+            ]);
+        }
 
         $this->forgetAdCaches($ad->position);
         $this->activityLog->log('create', 'advertisements', $ad, ['name' => $ad->name]);
@@ -85,6 +109,7 @@ class AdvertisementController extends Controller
         $ad = Advertisement::findOrFail($id);
         $oldPosition = $ad->position;
         $oldImage = $ad->image;
+        $oldAdvertiserId = $ad->advertiser_id;
 
         $data = $this->payloadFromRequest($request);
         $data['updated_by'] = $request->user()?->id;
@@ -97,7 +122,25 @@ class AdvertisementController extends Controller
             }
         }
 
+        if (array_key_exists('advertiser_id', $data) && (int) $data['advertiser_id'] !== (int) $oldAdvertiserId) {
+            $data['assigned_by'] = $request->user()?->id;
+            $data['assigned_at'] = now();
+        }
+
+        if (! empty($data['position']) && empty($data['banner_size'])) {
+            $data['banner_size'] = data_get(config('calculator_hub.ads.positions'), $data['position'].'.size_label');
+        }
+
         $ad->update($data);
+
+        if ($ad->advertiser_id && (int) $ad->advertiser_id !== (int) $oldAdvertiserId) {
+            AdvertisementAssignment::query()->create([
+                'advertisement_id' => $ad->id,
+                'advertiser_id' => $ad->advertiser_id,
+                'assigned_by' => $request->user()?->id,
+                'assigned_at' => now(),
+            ]);
+        }
 
         $this->forgetAdCaches($oldPosition);
         if ($ad->position !== $oldPosition) {
@@ -130,10 +173,45 @@ class AdvertisementController extends Controller
     public function toggleActive(int $id): JsonResponse
     {
         $ad = Advertisement::findOrFail($id);
-        $ad->update(['is_active' => ! $ad->is_active]);
+        $active = ! $ad->is_active;
+        $ad->update([
+            'is_active' => $active,
+            'status' => $active ? Advertisement::STATUS_ACTIVE : Advertisement::STATUS_PAUSED,
+        ]);
         $this->forgetAdCaches($ad->position);
 
         return response()->json(['message' => 'Status updated successfully.', 'data' => $this->toResponseData($ad)]);
+    }
+
+    public function pause(int $id): JsonResponse
+    {
+        $ad = Advertisement::findOrFail($id);
+        $ad->update(['status' => Advertisement::STATUS_PAUSED, 'is_active' => false]);
+        $this->forgetAdCaches($ad->position);
+
+        return response()->json(['message' => 'Advertisement paused.', 'data' => $this->toResponseData($ad)]);
+    }
+
+    public function resume(int $id): JsonResponse
+    {
+        $ad = Advertisement::findOrFail($id);
+        $ad->update(['status' => Advertisement::STATUS_ACTIVE, 'is_active' => true]);
+        $this->forgetAdCaches($ad->position);
+
+        return response()->json(['message' => 'Advertisement resumed.', 'data' => $this->toResponseData($ad)]);
+    }
+
+    public function expire(int $id): JsonResponse
+    {
+        $ad = Advertisement::findOrFail($id);
+        $ad->update([
+            'status' => Advertisement::STATUS_EXPIRED,
+            'is_active' => false,
+            'end_at' => now(),
+        ]);
+        $this->forgetAdCaches($ad->position);
+
+        return response()->json(['message' => 'Advertisement expired.', 'data' => $this->toResponseData($ad)]);
     }
 
     /**

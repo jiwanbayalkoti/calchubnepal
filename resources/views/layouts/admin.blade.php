@@ -179,6 +179,18 @@
                             <p>Advertisements</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.advertisers.index') }}" class="nav-link {{ str($current)->startsWith('admin.advertisers') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-building"></i>
+                            <p>Advertisers</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.ad-reports.index') }}" class="nav-link {{ str($current)->startsWith('admin.ad-reports') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-chart-pie"></i>
+                            <p>Ad Reports</p>
+                        </a>
+                    </li>
 
                     <li class="nav-header">USERS &amp; ACCESS</li>
                     <li class="nav-item">

@@ -40,12 +40,15 @@
                     })
                     ->values()
                     ->map(fn ($row) => [
+                        'id' => $row->id,
                         'name' => $row->name,
                         'ad_type' => $row->ad_type,
                         'adsense_code' => $row->adsense_code,
                         'image' => $row->image,
                         'link_url' => $row->link_url,
                         'content' => $row->content,
+                        'impression_url' => route('ads.impression', $row->id),
+                        'click_url' => route('ads.click', $row->id),
                     ])
                     ->all();
             }

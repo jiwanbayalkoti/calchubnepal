@@ -56,12 +56,13 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Advertiser</th>
                         <th>Position</th>
                         <th>Type</th>
                         <th>Active</th>
                         <th>Impressions</th>
                         <th>Clicks</th>
-                        <th style="width:140px;">Actions</th>
+                        <th style="width:220px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -109,6 +110,21 @@
                                     <option value="html">HTML</option>
                                     <option value="adsense">AdSense</option>
                                 </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Assign Advertiser</label>
+                                <select name="advertiser_id" class="form-control select2">
+                                    <option value="">— Unassigned —</option>
+                                    @foreach ($advertisers as $adv)
+                                        <option value="{{ $adv->id }}">{{ $adv->company_name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Banner Size</label>
+                                <input type="text" name="banner_size" class="form-control" placeholder="Auto from position">
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
@@ -277,6 +293,7 @@ $(function () {
         order: [[0, 'asc']],
         columns: [
             { data: 'name', name: 'name' },
+            { data: 'advertiser', name: 'advertiser', defaultContent: '—' },
             { data: 'position', name: 'position' },
             { data: 'ad_type', name: 'ad_type' },
             {
@@ -290,10 +307,26 @@ $(function () {
                 render: (row) => `
                     <div class="table-actions">
                         <button class="btn btn-sm btn-info btn-edit" data-id="${row.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-warning btn-pause" data-id="${row.id}" title="Pause"><i class="fas fa-pause"></i></button>
+                        <button class="btn btn-sm btn-success btn-resume" data-id="${row.id}" title="Resume"><i class="fas fa-play"></i></button>
+                        <button class="btn btn-sm btn-secondary btn-expire" data-id="${row.id}" title="Expire"><i class="fas fa-hourglass-end"></i></button>
                         <button class="btn btn-sm btn-danger btn-delete" data-id="${row.id}" data-name="${row.name}"><i class="fas fa-trash"></i></button>
                     </div>`,
             },
         ],
+    });
+
+    $(document).on('click', '.btn-pause', function () {
+        $.ajax({ url: '{{ url('admin/advertisements') }}/' + $(this).data('id') + '/pause', method: 'PATCH' })
+            .done(() => { toastr.success('Paused'); $('#adsTable').DataTable().ajax.reload(null, false); });
+    });
+    $(document).on('click', '.btn-resume', function () {
+        $.ajax({ url: '{{ url('admin/advertisements') }}/' + $(this).data('id') + '/resume', method: 'PATCH' })
+            .done(() => { toastr.success('Resumed'); $('#adsTable').DataTable().ajax.reload(null, false); });
+    });
+    $(document).on('click', '.btn-expire', function () {
+        $.ajax({ url: '{{ url('admin/advertisements') }}/' + $(this).data('id') + '/expire', method: 'PATCH' })
+            .done(() => { toastr.success('Expired'); $('#adsTable').DataTable().ajax.reload(null, false); });
     });
 
     $('#btnAddAd').on('click', function (e) {

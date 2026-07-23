@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdReportController;
 use App\Http\Controllers\Admin\AdvertisementController;
+use App\Http\Controllers\Admin\AdvertiserController;
 use App\Http\Controllers\Admin\AiPromptController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ApiKeyController;
@@ -58,9 +60,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('advertisements/data', [AdvertisementController::class, 'data'])->name('advertisements.data');
     Route::patch('advertisements/{id}/toggle-active', [AdvertisementController::class, 'toggleActive'])->name('advertisements.toggle-active');
+    Route::patch('advertisements/{id}/pause', [AdvertisementController::class, 'pause'])->name('advertisements.pause');
+    Route::patch('advertisements/{id}/resume', [AdvertisementController::class, 'resume'])->name('advertisements.resume');
+    Route::patch('advertisements/{id}/expire', [AdvertisementController::class, 'expire'])->name('advertisements.expire');
     Route::resource('advertisements', AdvertisementController::class)
         ->except(['create', 'edit'])
         ->parameters(['advertisements' => 'id']);
+
+    Route::get('advertisers/data', [AdvertiserController::class, 'data'])->name('advertisers.data');
+    Route::resource('advertisers', AdvertiserController::class)
+        ->except(['create', 'edit'])
+        ->parameters(['advertisers' => 'id']);
+
+    Route::get('ad-reports', [AdReportController::class, 'index'])->name('ad-reports.index');
+    Route::get('ad-reports/data', [AdReportController::class, 'data'])->name('ad-reports.data');
+    Route::get('ad-reports/export/excel', [AdReportController::class, 'exportExcel'])->name('ad-reports.export.excel');
+    Route::get('ad-reports/export/pdf', [AdReportController::class, 'exportPdf'])->name('ad-reports.export.pdf');
 
     Route::get('users/data', [UserController::class, 'data'])->name('users.data');
     Route::patch('users/{id}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');

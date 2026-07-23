@@ -44,9 +44,7 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        $default = $user?->canAccessAdmin()
-            ? route('admin.dashboard', absolute: false)
-            : route('account.dashboard', absolute: false);
+        $default = $user?->homePath() ?? route('account.dashboard', absolute: false);
 
         $redirectTo = $request->session()->pull('url.intended', $default);
 

@@ -27,6 +27,7 @@ class RolePermissionSeeder extends Seeder
         'roles' => 'Roles & Permissions',
         'blog' => 'Blog',
         'advertisements' => 'Advertisements',
+        'advertisers' => 'Advertisers',
         'subscriptions' => 'Subscriptions',
         'api_keys' => 'API Keys',
         'feedback' => 'Feedback',
@@ -74,6 +75,7 @@ class RolePermissionSeeder extends Seeder
             $this->seedAdmin($permissions);
             $this->seedEditor($permissions);
             $this->seedUser();
+            $this->seedAdvertiser();
         });
     }
 
@@ -202,5 +204,18 @@ class RolePermissionSeeder extends Seeder
         );
 
         $role->permissions()->sync([]);
+    }
+
+    protected function seedAdvertiser(): void
+    {
+        Role::query()->updateOrCreate(
+            ['slug' => 'advertiser'],
+            [
+                'name' => 'Advertiser',
+                'guard_name' => 'web',
+                'description' => 'Read-only advertiser portal access to own ads, reports, and profile.',
+                'is_system' => true,
+            ]
+        )->permissions()->sync([]);
     }
 }

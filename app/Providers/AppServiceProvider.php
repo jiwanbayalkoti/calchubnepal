@@ -4,8 +4,12 @@ namespace App\Providers;
 
 use App\Contracts\Repositories\CalculatorRepositoryInterface;
 use App\Contracts\Services\CalculatorServiceInterface;
+use App\Models\Advertisement;
+use App\Models\Advertiser;
 use App\Models\BlogPost;
 use App\Models\Calculator;
+use App\Policies\AdvertisementPolicy;
+use App\Policies\AdvertiserPolicy;
 use App\Policies\BlogPostPolicy;
 use App\Policies\CalculatorPolicy;
 use App\Repositories\CalculatorRepository;
@@ -60,6 +64,8 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::policy(Calculator::class, CalculatorPolicy::class);
         Gate::policy(BlogPost::class, BlogPostPolicy::class);
+        Gate::policy(Advertisement::class, AdvertisementPolicy::class);
+        Gate::policy(Advertiser::class, AdvertiserPolicy::class);
 
         // Help Windows/XAMPP PHP verify HTTPS (Google OAuth, AI APIs, etc.).
         $caBundle = base_path('certificates/cacert.pem');
