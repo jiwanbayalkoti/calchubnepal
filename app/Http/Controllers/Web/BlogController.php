@@ -59,7 +59,7 @@ class BlogController extends Controller
             ->take(3)
             ->get();
 
-        $toc = $this->buildTableOfContents((string) $post->content);
+        [$contentHtml, $toc] = $this->injectHeadingIdsAndBuildToc((string) $post->content);
 
         $breadcrumbs = [
             ['name' => 'Home', 'url' => url('/')],
@@ -76,6 +76,7 @@ class BlogController extends Controller
 
         return view('blog.show', [
             'post' => $post,
+            'contentHtml' => $contentHtml,
             'related' => $related,
             'toc' => $toc,
             'breadcrumbs' => $breadcrumbs,
@@ -85,34 +86,56 @@ class BlogController extends Controller
     }
 
     /**
-     * Extract h2/h3 headings from HTML content to build a simple TOC.
+     * Ensure h2/h3 headings have unique ids and build a matching TOC.
      *
-     * @return array<int, array{id: string, text: string, level: int}>
+     * @return array{0: string, 1: array<int, array{id: string, text: string, level: int}>}
      */
-    protected function buildTableOfContents(string $html): array
+    protected function injectHeadingIdsAndBuildToc(string $html): array
     {
         if ($html === '') {
-            return [];
+            return ['', []];
         }
 
         $toc = [];
+        $used = [];
 
-        if (preg_match_all('/<h([23])[^>]*>(.*?)<\/h\1>/i', $html, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $text = trim(strip_tags($match[2]));
+        $content = preg_replace_callback(
+            '/<h([23])(\s[^>]*)?>(.*?)<\/h\1>/is',
+            function (array $match) use (&$toc, &$used): string {
+                $level = (int) $match[1];
+                $attrs = $match[2] ?? '';
+                $inner = $match[3];
+                $text = trim(strip_tags($inner));
 
                 if ($text === '') {
-                    continue;
+                    return $match[0];
                 }
 
-                $toc[] = [
-                    'id' => \Illuminate\Support\Str::slug($text),
-                    'text' => $text,
-                    'level' => (int) $match[1],
-                ];
-            }
-        }
+                if (preg_match('/\bid\s*=\s*(["\'])(.*?)\1/i', $attrs, $idMatch)) {
+                    $id = $idMatch[2];
+                } else {
+                    $base = \Illuminate\Support\Str::slug($text) ?: 'section';
+                    $id = $base;
+                    $n = 2;
+                    while (isset($used[$id])) {
+                        $id = $base.'-'.$n;
+                        $n++;
+                    }
+                    $attrs .= ' id="'.e($id).'"';
+                }
 
-        return $toc;
+                $used[$id] = true;
+                $toc[] = [
+                    'id' => $id,
+                    'text' => $text,
+                    'level' => $level,
+                ];
+
+                return '<h'.$level.$attrs.'>'.$inner.'</h'.$level.'>';
+            },
+            $html
+        );
+
+        return [$content ?? $html, $toc];
     }
 }

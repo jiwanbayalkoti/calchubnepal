@@ -25,8 +25,8 @@
                         <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100 mb-4" style="max-height:420px;object-fit:cover;border-radius:var(--radius-md);" alt="{{ $post->title }}">
                     @endif
 
-                    <div class="blog-content">
-                        {!! $post->content !!}
+                    <div class="blog-content" id="blogArticleContent">
+                        {!! $contentHtml !!}
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between mt-5 no-print">
@@ -66,19 +66,75 @@
                     @endif
                 </div>
 
-                <div class="col-lg-4">
-                    @if(!empty($toc))
-                        <div class="toc-box mb-3">
-                            <h6 class="text-uppercase small fw-bold text-muted-custom mb-3">On this page</h6>
-                            @foreach($toc as $item)
-                                <a href="#{{ $item['id'] }}" class="{{ $item['level'] === 3 ? 'ps-3' : '' }}">{{ $item['text'] }}</a>
-                            @endforeach
-                        </div>
-                    @endif
+                <div class="col-lg-4 blog-sidebar-col">
+                    <aside class="blog-sidebar-sticky">
+                        @if(!empty($toc))
+                            <nav class="toc-box" aria-label="On this page">
+                                <h6 class="text-uppercase small fw-bold text-muted-custom mb-3">On this page</h6>
+                                <div class="toc-box__links">
+                                    @foreach($toc as $item)
+                                        <a href="#{{ $item['id'] }}" class="toc-link{{ $item['level'] === 3 ? ' ps-3' : '' }}" data-toc-target="{{ $item['id'] }}">{{ $item['text'] }}</a>
+                                    @endforeach
+                                </div>
+                            </nav>
+                        @endif
 
-                    @include('partials.ads.sidebar')
+                        @include('partials.ads.sidebar')
+                    </aside>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const tocLinks = document.querySelectorAll('.toc-box .toc-link');
+    if (!tocLinks.length) return;
+
+    const clearHighlights = () => {
+        document.querySelectorAll('.blog-content .is-highlighted').forEach((el) => {
+            el.classList.remove('is-highlighted');
+        });
+        tocLinks.forEach((link) => link.classList.remove('is-active'));
+    };
+
+    const highlightTarget = (id, link) => {
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        clearHighlights();
+        target.classList.add('is-highlighted');
+        if (link) link.classList.add('is-active');
+
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        window.clearTimeout(highlightTarget._timer);
+        highlightTarget._timer = window.setTimeout(() => {
+            target.classList.remove('is-highlighted');
+        }, 2200);
+    };
+
+    tocLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+            const id = link.getAttribute('data-toc-target') || (link.getAttribute('href') || '').replace(/^#/, '');
+            if (!id || !document.getElementById(id)) return;
+            e.preventDefault();
+            highlightTarget(id, link);
+            if (history.replaceState) {
+                history.replaceState(null, '', '#' + id);
+            }
+        });
+    });
+
+    if (location.hash) {
+        const id = location.hash.slice(1);
+        const link = document.querySelector('.toc-box .toc-link[data-toc-target="' + CSS.escape(id) + '"]');
+        if (document.getElementById(id)) {
+            window.setTimeout(() => highlightTarget(id, link), 80);
+        }
+    }
+})();
+</script>
+@endpush
