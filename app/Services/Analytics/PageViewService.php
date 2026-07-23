@@ -14,7 +14,7 @@ use Throwable;
 /**
  * Persists public page views for the admin Analytics dashboard.
  *
- * Country comes from CDN/proxy geo headers (e.g. Cloudflare CF-IPCountry).
+ * Country prefers CDN/proxy geo headers, then a cached IP lookup.
  * IP is stored truncated for admin abuse review only — never sent to AdSense
  * or used for client-side advertising personalization.
  */
@@ -22,6 +22,10 @@ class PageViewService
 {
     /** Seconds before the same session can re-count the same path. */
     private const DEDUPE_SECONDS = 1800;
+
+    public function __construct(protected GeoCountryResolver $geo)
+    {
+    }
 
     public function record(Request $request, ?Model $calculable = null): void
     {
@@ -50,7 +54,7 @@ class PageViewService
                 'calculable_id' => $calculable?->getKey(),
                 'path' => mb_substr($path, 0, 255),
                 'referrer' => $this->referrer($request),
-                'country' => $this->countryCode($request),
+                'country' => $this->resolveCountry($request, $ip),
                 'device' => $this->device($request->userAgent()),
                 'ip_hash' => $this->ipHash($ip),
                 'ip_truncated' => $this->truncateIp($ip),
@@ -63,6 +67,12 @@ class PageViewService
                 'path' => $request->path(),
             ]);
         }
+    }
+
+    protected function resolveCountry(Request $request, ?string $ip): ?string
+    {
+        return $this->geo->fromHeaders($request->headers->all())
+            ?? $this->geo->fromIp($ip);
     }
 
     protected function resolveCalculable(Request $request): ?Model
@@ -102,29 +112,6 @@ class PageViewService
         }
 
         return mb_substr($referrer, 0, 255);
-    }
-
-    /**
-     * ISO-3166 alpha-2 from CDN/proxy headers only (no client fingerprinting).
-     */
-    protected function countryCode(Request $request): ?string
-    {
-        $headers = [
-            'CF-IPCountry',
-            'CloudFront-Viewer-Country',
-            'X-AppEngine-Country',
-            'X-Country-Code',
-            'X-Geo-Country',
-        ];
-
-        foreach ($headers as $header) {
-            $value = strtoupper(trim((string) $request->headers->get($header, '')));
-            if ($value !== '' && preg_match('/^[A-Z]{2}$/', $value) && ! in_array($value, ['XX', 'T1'], true)) {
-                return $value;
-            }
-        }
-
-        return null;
     }
 
     protected function device(?string $userAgent): string
