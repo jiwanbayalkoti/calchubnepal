@@ -92,6 +92,7 @@
                             <div class="col-md-3 form-group">
                                 <label>Publish Date</label>
                                 <input type="datetime-local" name="published_at" class="form-control">
+                                <small class="form-text text-muted">Nepal time (Asia/Kathmandu). Leave empty to publish immediately.</small>
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>

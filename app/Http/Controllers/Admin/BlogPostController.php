@@ -87,6 +87,8 @@ class BlogPostController extends Controller
 
         $data = $post->toArray();
         $data['tags'] = $post->tags->pluck('name')->implode(', ');
+        // datetime-local needs local (app timezone) Y-m-d\TH:i, not ISO8601 UTC
+        $data['published_at'] = $post->published_at?->timezone(config('app.timezone'))->format('Y-m-d\TH:i');
 
         return response()->json(['data' => $data]);
     }

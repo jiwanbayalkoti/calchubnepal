@@ -83,7 +83,7 @@ class BlogPost extends Model
     {
         return $this->status === self::STATUS_PUBLISHED
             && $this->published_at !== null
-            && $this->published_at->isPast();
+            && $this->published_at->lte(now());
     }
 
     public function incrementViews(): void
@@ -114,6 +114,10 @@ class BlogPost extends Model
         static::saving(function (self $post): void {
             if (blank($post->slug) && filled($post->title)) {
                 $post->slug = Str::slug($post->title);
+            }
+
+            if ($post->status === self::STATUS_PUBLISHED && blank($post->published_at)) {
+                $post->published_at = now();
             }
 
             if (blank($post->reading_time_minutes) || $post->reading_time_minutes < 1) {
