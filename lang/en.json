@@ -163,6 +163,7 @@
     "about.who_p1": "Most online calculators show a result without explaining the method, units, or assumptions. We build free tools where every input is clear, every formula is documented, and FAQs catch the questions people actually ask.",
     "about.who_p2": "We operate from Kathmandu, Nepal, and serve users worldwide — from homeowners estimating materials to founders modeling tax and energy costs. Accurate tools, plain language, no unnecessary friction.",
     "about.coverage_title": "What we cover",
+    "about.coverage_empty": "Categories will appear here once calculators are published.",
     "about.cov_finance": "Finance, loans & investing",
     "about.cov_construction": "Construction & materials",
     "about.cov_climate": "Climate, solar & energy",

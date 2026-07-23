@@ -9,6 +9,7 @@ use App\Models\Calculator;
 use App\Models\CalculatorCategory;
 use App\Services\Seo\SeoService;
 use App\Services\Settings\AppSettings;
+use App\Support\CatalogStatsCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
@@ -43,7 +44,7 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        $catalogCounts = Cache::remember('calc_hub:home:catalog_counts', 3600, function () {
+        $catalogCounts = Cache::remember(CatalogStatsCache::HOME_KEY, 900, function () {
             return [
                 'calculators' => Calculator::query()->where('is_active', true)->count(),
                 'categories' => CalculatorCategory::query()->active()->count(),

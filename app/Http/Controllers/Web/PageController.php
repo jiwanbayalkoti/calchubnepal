@@ -14,6 +14,7 @@ use App\Notifications\Admin\ContactMessageReceived;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Admin\AdminNotifier;
 use App\Services\Seo\SeoService;
+use App\Support\CatalogStatsCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
@@ -30,13 +31,21 @@ class PageController extends Controller
 
     public function about(): View
     {
-        $stats = Cache::remember('calc_hub:about:stats', 3600, function () {
+        $stats = Cache::remember(CatalogStatsCache::ABOUT_KEY, 900, function () {
             return [
-                'calculators' => Calculator::query()->where('is_active', true)->count(),
-                'categories' => CalculatorCategory::query()->where('is_active', true)->count(),
+                'calculators' => Calculator::query()->active()->count(),
+                'categories' => CalculatorCategory::query()->active()->count(),
                 'guides' => BlogPost::query()->published()->count(),
             ];
         });
+
+        $coverageCategories = CalculatorCategory::query()
+            ->active()
+            ->ordered()
+            ->whereHas('calculators', fn ($q) => $q->active())
+            ->withCount(['calculators' => fn ($q) => $q->active()])
+            ->take(10)
+            ->get();
 
         $meta = $this->seo->buildMeta(null, [
             'title' => __('about.meta_title'),
@@ -47,6 +56,7 @@ class PageController extends Controller
         return view('pages.about', [
             'meta' => $meta,
             'stats' => $stats,
+            'coverageCategories' => $coverageCategories,
         ]);
     }
 

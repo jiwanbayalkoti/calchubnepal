@@ -124,5 +124,11 @@ class BlogPost extends Model
                 $post->reading_time_minutes = $post->estimateReadingTime();
             }
         });
+
+        $forget = static fn () => \App\Support\CatalogStatsCache::forget();
+
+        static::saved($forget);
+        static::deleted($forget);
+        static::restored($forget);
     }
 }

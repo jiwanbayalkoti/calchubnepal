@@ -17,19 +17,19 @@
             <div class="row g-3 g-lg-4 mb-5 about-stats">
                 <div class="col-md-4">
                     <div class="about-stat card-surface p-4 text-center h-100">
-                        <div class="about-stat__value">{{ number_format($stats['calculators']) }}+</div>
+                        <div class="about-stat__value" data-count="{{ (int) $stats['calculators'] }}">{{ number_format($stats['calculators']) }}</div>
                         <div class="about-stat__label">{{ __('about.stat_calculators') }}</div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="about-stat card-surface p-4 text-center h-100">
-                        <div class="about-stat__value">{{ number_format($stats['categories']) }}</div>
+                        <div class="about-stat__value" data-count="{{ (int) $stats['categories'] }}">{{ number_format($stats['categories']) }}</div>
                         <div class="about-stat__label">{{ __('about.stat_categories') }}</div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="about-stat card-surface p-4 text-center h-100">
-                        <div class="about-stat__value">{{ number_format($stats['guides']) }}+</div>
+                        <div class="about-stat__value" data-count="{{ (int) $stats['guides'] }}">{{ number_format($stats['guides']) }}</div>
                         <div class="about-stat__label">{{ __('about.stat_guides') }}</div>
                     </div>
                 </div>
@@ -48,14 +48,17 @@
                     <div class="card-surface p-4 p-md-5 h-100">
                         <h2 class="h5 mb-3">{{ __('about.coverage_title') }}</h2>
                         <ul class="about-coverage list-unstyled mb-0">
-                            <li><i class="bi bi-cash-coin"></i> {{ __('about.cov_finance') }}</li>
-                            <li><i class="bi bi-bricks"></i> {{ __('about.cov_construction') }}</li>
-                            <li><i class="bi bi-sun"></i> {{ __('about.cov_climate') }}</li>
-                            <li><i class="bi bi-receipt"></i> {{ __('about.cov_tax') }}</li>
-                            <li><i class="bi bi-car-front"></i> {{ __('about.cov_auto') }}</li>
-                            <li><i class="bi bi-lightning-charge"></i> {{ __('about.cov_productivity') }}</li>
-                            <li><i class="bi bi-heart-pulse"></i> {{ __('about.cov_health') }}</li>
-                            <li><i class="bi bi-flag"></i> {{ __('about.cov_nepal') }}</li>
+                            @forelse($coverageCategories as $category)
+                                <li>
+                                    <a href="{{ route('categories.show', $category) }}" class="about-coverage__link">
+                                        <i class="bi {{ $category->icon ?: 'bi-grid' }}"></i>
+                                        <span class="about-coverage__name">{{ $category->name }}</span>
+                                        <span class="about-coverage__count">{{ number_format($category->calculators_count) }}</span>
+                                    </a>
+                                </li>
+                            @empty
+                                <li class="text-muted-custom">{{ __('about.coverage_empty') }}</li>
+                            @endforelse
                         </ul>
                     </div>
                 </div>

@@ -145,4 +145,13 @@ class Calculator extends Model
     {
         return $query->orderBy('sort_order')->orderBy('title');
     }
+
+    protected static function booted(): void
+    {
+        $forget = static fn () => \App\Support\CatalogStatsCache::forget();
+
+        static::saved($forget);
+        static::deleted($forget);
+        static::restored($forget);
+    }
 }
