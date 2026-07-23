@@ -276,6 +276,7 @@ class CalculatorSeeder extends Seeder
         // Daily life
         'age_calculator' => 'daily-life',
         'date_difference_calculator' => 'daily-life',
+        'date_converter_calculator' => 'daily-life',
         'time_calculator' => 'daily-life',
 
         // Engineering
@@ -430,6 +431,11 @@ class CalculatorSeeder extends Seeder
         'date_difference_calculator' => [
             'start_date' => '2024-01-01',
             'end_date' => '2024-12-31',
+        ],
+        'date_converter_calculator' => [
+            'direction' => 'ad_to_bs',
+            'ad_date' => '2026-07-23',
+            'bs_date' => '2083-04-07',
         ],
         'time_calculator' => [
             'mode' => 'difference',
@@ -1022,6 +1028,20 @@ class CalculatorSeeder extends Seeder
                 ['How many days are between two dates?', 'Enter both dates and the calculator instantly shows the total number of days between them, along with the equivalent in years, months, weeks and business days.'],
                 ['What counts as a business day?', 'Business days are counted as Monday through Friday, excluding Saturdays and Sundays - public holidays are not automatically excluded.'],
                 ['Does it matter which date I enter first?', 'No, the calculator automatically detects if the end date is earlier than the start date and swaps them, so the result is always a positive duration.'],
+            ],
+        ],
+        'date_converter_calculator' => [
+            'title' => 'Date Converter (AD ↔ BS)',
+            'icon' => 'fas fa-exchange-alt',
+            'short_description' => 'Convert English (AD / Gregorian) dates to Nepali Bikram Sambat (BS) and BS back to AD.',
+            'description' => 'The Date Converter converts between the Gregorian calendar (AD) and Nepal’s official Bikram Sambat (BS) calendar in both directions. Use it for forms, documents, festivals, and official date translations. Supported range: AD 1944–2033 / BS 2000–2089.',
+            'formula_description' => 'Conversion uses a validated Bikram Sambat month-length lookup table (not a fixed year offset). AD→BS accumulates Gregorian days from a known epoch and maps into BS year/month/day; BS→AD reverses that mapping.',
+            'meta_title' => 'AD to BS Date Converter - Nepali Bikram Sambat Calendar | Calculator Hub',
+            'meta_description' => 'Convert AD (English) dates to BS (Bikram Sambat) and BS to AD instantly. Free Nepali date converter for Nepal.',
+            'faqs' => [
+                ['How do I convert AD to BS?', 'Choose “AD → BS”, enter the Gregorian date, and calculate. You will get the matching Bikram Sambat year, month and day with weekday.'],
+                ['How do I convert BS to AD?', 'Choose “BS → AD”, enter the BS year, Nepali month and day, then calculate to get the Gregorian date.'],
+                ['What date range is supported?', 'This converter supports AD dates from 1944 to 2033 and BS dates from 2000 to 2089, based on the embedded calendar table.'],
             ],
         ],
         'time_calculator' => [

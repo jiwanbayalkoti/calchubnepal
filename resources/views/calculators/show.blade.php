@@ -229,3 +229,45 @@
         </div>
     </section>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
+<style>
+    .ndp-nepali-calendar { z-index: 2050 !important; }
+    .js-bs-datepicker { cursor: pointer; background: var(--card); }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
+<script>
+(function () {
+    document.querySelectorAll('.js-bs-datepicker').forEach(function (el) {
+        if (typeof el.NepaliDatePicker === 'function') {
+            el.NepaliDatePicker();
+        }
+    });
+
+    var form = document.querySelector('.js-calculator-form[data-slug="date-converter-calculator"]');
+    if (!form) return;
+
+    var dir = form.querySelector('#field-direction');
+    var adWrap = form.querySelector('#field-ad_date') ? form.querySelector('#field-ad_date').closest('.col-md-6') : null;
+    var bsWrap = form.querySelector('#field-bs_date') ? form.querySelector('#field-bs_date').closest('.col-md-6') : null;
+
+    function syncDirectionFields() {
+        var value = dir ? dir.value : 'ad_to_bs';
+        if (adWrap) adWrap.style.display = value === 'ad_to_bs' ? '' : 'none';
+        if (bsWrap) bsWrap.style.display = value === 'bs_to_ad' ? '' : 'none';
+    }
+
+    if (dir) {
+        dir.addEventListener('change', syncDirectionFields);
+        if (window.jQuery) {
+            window.jQuery(dir).on('change select2:select', syncDirectionFields);
+        }
+    }
+    syncDirectionFields();
+})();
+</script>
+@endpush

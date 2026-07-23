@@ -85,6 +85,11 @@ abstract class AbstractCalculatorHandler implements CalculatorHandlerInterface
                     $fieldRules[] = 'date';
                     break;
 
+                case 'bs_date':
+                    $fieldRules[] = 'string';
+                    $fieldRules[] = 'regex:/^\d{4}[-\/]\d{1,2}[-\/]\d{1,2}$/';
+                    break;
+
                 case 'time':
                     $fieldRules[] = 'date_format:H:i';
                     break;

@@ -689,6 +689,7 @@ class CatalogExpansionSeeder extends Seeder
 
         // ── Date & Time ──────────────────────────────────────────────
         $add('age-calculator', 'Age Calculator', 'daily-life', 'Exact age in years, months and days from date of birth, plus totals.');
+        $add('date-converter-calculator', 'Date Converter (AD ↔ BS)', 'daily-life', 'Convert English (AD) dates to Nepali Bikram Sambat (BS) and BS back to AD.');
         $add('dog-age-in-human-years-calculator', 'Dog Age in Human Years Calculator', 'daily-life', 'Convert dog age to human years using the 2019 AVMA logarithmic method.');
         $add('days-between-dates-calculator', 'Days Between Dates Calculator', 'daily-life', 'Exact day count, business days, weeks, months and Y/M/D between two dates.');
         $add('days-until-calculator', 'Days Until Calculator', 'daily-life', 'Countdown (or days-since) from today to any target date in days, weeks and Y/M/D.');

@@ -144,6 +144,7 @@ class CalculatorIconMap
             // Daily life
             'age_calculator' => 'bi-cake2',
             'date_difference_calculator' => 'bi-calendar-range',
+            'date_converter_calculator' => 'bi-arrow-left-right',
             'time_calculator' => 'bi-clock-history',
             'business_days_calculator' => 'bi-calendar2-week',
             'countdown_calculator' => 'bi-hourglass',

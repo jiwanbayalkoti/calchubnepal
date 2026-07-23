@@ -31,6 +31,15 @@
     @elseif($type === 'date')
         <input type="date" name="{{ $name }}" id="field-{{ $name }}" class="form-control" value="{{ $default }}" {{ $required ? 'required' : '' }}>
 
+    @elseif($type === 'bs_date')
+        <input type="text" name="{{ $name }}" id="field-{{ $name }}" class="form-control js-bs-datepicker"
+               value="{{ $default }}"
+               placeholder="YYYY-MM-DD (BS)"
+               autocomplete="off"
+               inputmode="numeric"
+               {{ $required ? 'required' : '' }}>
+        <small class="text-muted-custom">Click to open Nepali (BS) calendar</small>
+
     @elseif($type === 'time')
         <input type="time" name="{{ $name }}" id="field-{{ $name }}" class="form-control" value="{{ $default }}" {{ $required ? 'required' : '' }}>
 
