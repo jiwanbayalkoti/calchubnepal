@@ -34,7 +34,9 @@
             <div class="account-list-item d-flex justify-content-between align-items-center">
                 <div>
                     <strong>{{ $t->name }}</strong>
-                    @if($t->is_default)<span class="badge bg-light text-dark border ms-1">Default</span>@endif
+                    @if($t->is_default)
+                        <span class="badge bg-light text-dark border ms-1">Default</span>
+                    @endif
                     <div class="small text-muted-custom">{{ $t->style_json['foreground'] ?? '' }} / {{ $t->style_json['module_style'] ?? '' }}</div>
                 </div>
                 <form method="POST" action="{{ route('account.brand-templates.destroy', $t) }}" onsubmit="return confirm('Delete template?')">@csrf @method('DELETE')<button class="btn btn-sm btn-soft">Delete</button></form>

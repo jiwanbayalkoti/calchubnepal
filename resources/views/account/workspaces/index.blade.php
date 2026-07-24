@@ -29,7 +29,7 @@
             <div class="account-list-item d-flex justify-content-between align-items-center gap-2">
                 <div>
                     <a href="{{ route('account.workspaces.show', $ws) }}" class="fw-semibold text-decoration-none">{{ $ws->name }}</a>
-                    <div class="small text-muted-custom">{{ $ws->members_count }} members · {{ $ws->qr_codes_count }} QRs @if($ws->white_label_enabled)· White label@endif</div>
+                    <div class="small text-muted-custom">{{ $ws->members_count }} members · {{ $ws->qr_codes_count }} QRs{{ $ws->white_label_enabled ? ' · White label' : '' }}</div>
                 </div>
                 <a href="{{ route('account.workspaces.show', $ws) }}" class="btn btn-sm btn-soft">Open</a>
             </div>

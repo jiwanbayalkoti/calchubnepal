@@ -4,7 +4,7 @@
     <div class="mb-4">
         <a href="{{ route('account.workspaces.index') }}" class="small text-muted-custom text-decoration-none">&larr; Workspaces</a>
         <h1 class="h3 mb-1 mt-1">{{ $workspace->name }}</h1>
-        <p class="text-muted-custom mb-0">Role: {{ $role?->label() }} @if($workspace->white_label_enabled)· White label on@endif</p>
+        <p class="text-muted-custom mb-0">Role: {{ $role?->label() }}{{ $workspace->white_label_enabled ? ' · White label on' : '' }}</p>
     </div>
 
     <div class="row g-3 mb-4">
