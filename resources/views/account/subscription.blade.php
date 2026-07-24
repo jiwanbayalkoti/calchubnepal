@@ -2,7 +2,7 @@
 
 @section('account')
     <h1 class="h3 mb-1">Subscription</h1>
-    <p class="text-muted-custom mb-4">Your current plan and available upgrades.</p>
+    <p class="text-muted-custom mb-4">Your current plan and available upgrades. Premium unlocks workspaces, white label, higher bulk/API limits.</p>
 
     <div class="card-surface p-3 p-md-4 mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -23,51 +23,57 @@
                     <div class="small text-muted-custom">Premium until {{ $user->premium_expires_at->format('M j, Y') }}</div>
                 @else
                     <div class="small text-muted-custom">
-                        {{ $isPremium ? 'Premium access is active.' : 'Upgrade anytime to unlock more saved results and premium tools.' }}
+                        {{ $isPremium ? 'Premium access is active.' : 'Upgrade anytime to unlock enterprise QR tools.' }}
                     </div>
                 @endif
             </div>
-            @unless ($isPremium)
-                <a href="{{ route('pricing') }}" class="btn btn-brand">View pricing</a>
-            @endunless
         </div>
     </div>
 
     <h2 class="h5 mb-3">Available plans</h2>
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         @forelse ($plans as $plan)
             <div class="col-md-6 col-xl-4">
                 <div class="card-surface p-3 h-100 d-flex flex-column">
-                    <div class="fw-semibold">{{ $plan->name }}</div>
-                    <div class="display-6 my-2" style="font-size:1.75rem;">
-                        {{ $plan->currency ?? 'USD' }} {{ number_format((float) $plan->price, 2) }}
-                        <small class="fs-6 text-muted-custom">/ {{ $plan->billing_period ?? 'month' }}</small>
+                    <h3 class="h5">{{ $plan->name }}</h3>
+                    <div class="mb-2">
+                        <span class="h4 mb-0">{{ $plan->currency }} {{ number_format((float) $plan->price, 2) }}</span>
+                        <span class="small text-muted-custom">/ {{ $plan->billing_period }}</span>
                     </div>
                     <p class="small text-muted-custom flex-grow-1">{{ $plan->description }}</p>
-                    @if (is_array($plan->features) && count($plan->features))
-                        <ul class="small ps-3 mb-3">
-                            @foreach ($plan->features as $feature)
-                                <li>{{ is_string($feature) ? $feature : json_encode($feature) }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    @if ($plan->isFree())
-                        <span class="btn btn-sm btn-soft disabled">Current free tier</span>
-                    @else
-                        <form action="{{ route('account.subscription.interest') }}" method="POST" class="js-plan-interest-form mt-auto">
+                    <ul class="small mb-3">
+                        @foreach(($plan->features ?? []) as $feature)
+                            <li>{{ $feature }}</li>
+                        @endforeach
+                    </ul>
+                    @if(!$plan->isFree())
+                        <form method="POST" action="{{ route('account.subscription.checkout') }}" class="mb-2">
                             @csrf
                             <input type="hidden" name="subscription_plan_id" value="{{ $plan->id }}">
-                            <button type="submit" class="btn btn-sm btn-outline-brand w-100">Request this plan</button>
+                            <button class="btn btn-brand btn-sm w-100">Checkout</button>
                         </form>
                     @endif
+                    <form method="POST" action="{{ route('account.subscription.interest') }}">
+                        @csrf
+                        <input type="hidden" name="subscription_plan_id" value="{{ $plan->id }}">
+                        <button class="btn btn-soft btn-sm w-100">Request / ask sales</button>
+                    </form>
                 </div>
             </div>
         @empty
-            <div class="col-12">
-                <div class="card-surface p-4 text-muted-custom">
-                    Plans will appear here once published. See the <a href="{{ route('pricing') }}">pricing page</a> for details.
-                </div>
-            </div>
+            <p class="text-muted-custom">No plans configured.</p>
         @endforelse
     </div>
+
+    @if(($transactions ?? collect())->isNotEmpty())
+        <h2 class="h5 mb-3">Recent payments</h2>
+        <div class="card-surface p-3">
+            @foreach($transactions as $tx)
+                <div class="d-flex justify-content-between small py-2 border-bottom">
+                    <span>{{ $tx->provider }} · {{ $tx->provider_reference }}</span>
+                    <span>{{ $tx->status }} · {{ $tx->currency }} {{ $tx->amount }}</span>
+                </div>
+            @endforeach
+        </div>
+    @endif
 @endsection

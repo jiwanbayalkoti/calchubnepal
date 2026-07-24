@@ -2,21 +2,29 @@
 
 namespace App\Providers;
 
+use App\Contracts\Qr\QrCodeGeneratorInterface;
+use App\Contracts\Qr\QrCodeRepositoryInterface;
 use App\Contracts\Repositories\CalculatorRepositoryInterface;
 use App\Contracts\Services\CalculatorServiceInterface;
 use App\Models\Advertisement;
 use App\Models\Advertiser;
 use App\Models\BlogPost;
 use App\Models\Calculator;
+use App\Models\QrCode;
 use App\Policies\AdvertisementPolicy;
 use App\Policies\AdvertiserPolicy;
 use App\Policies\BlogPostPolicy;
 use App\Policies\CalculatorPolicy;
+use App\Policies\QrCodePolicy;
 use App\Repositories\CalculatorRepository;
+use App\Repositories\Qr\EloquentQrCodeRepository;
 use App\Services\Ai\AiService;
 use App\Services\Ai\AiServiceInterface;
 use App\Services\Calculators\CalculatorEngineService;
 use App\Services\Calculators\CalculatorRegistry;
+use App\Services\Qr\EndroidQrCodeGenerator;
+use App\Services\Qr\QrGeneratorService;
+use App\Services\Qr\QrTypeRegistry;
 use App\Services\Settings\AppSettings;
 use App\Services\Settings\SettingsService;
 use Illuminate\Pagination\Paginator;
@@ -32,6 +40,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CalculatorRegistry::class);
+        $this->app->singleton(QrTypeRegistry::class);
+        $this->app->singleton(QrGeneratorService::class);
+        $this->app->bind(QrCodeGeneratorInterface::class, EndroidQrCodeGenerator::class);
+        $this->app->bind(QrCodeRepositoryInterface::class, EloquentQrCodeRepository::class);
+        $this->app->singleton(\App\Services\Payments\PaymentGatewayManager::class);
+        $this->app->bind(\App\Contracts\Payments\PaymentGatewayInterface::class, \App\Services\Payments\ManualPaymentGateway::class);
 
         $this->app->bind(CalculatorRepositoryInterface::class, CalculatorRepository::class);
 
@@ -66,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(BlogPost::class, BlogPostPolicy::class);
         Gate::policy(Advertisement::class, AdvertisementPolicy::class);
         Gate::policy(Advertiser::class, AdvertiserPolicy::class);
+        Gate::policy(QrCode::class, QrCodePolicy::class);
 
         // Help Windows/XAMPP PHP verify HTTPS (Google OAuth, AI APIs, etc.).
         $caBundle = base_path('certificates/cacert.pem');

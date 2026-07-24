@@ -30,6 +30,7 @@ class BlogPost extends Model
         'meta_title',
         'meta_description',
         'meta_keywords',
+        'related_qr_type',
         'status',
         'published_at',
         'reading_time_minutes',
@@ -102,6 +103,11 @@ class BlogPost extends Model
     {
         return $query->where('status', self::STATUS_PUBLISHED)
             ->where('published_at', '<=', now());
+    }
+
+    public function scopeForQrType($query, string $qrType)
+    {
+        return $query->where('related_qr_type', $qrType);
     }
 
     public function scopeFeatured($query)

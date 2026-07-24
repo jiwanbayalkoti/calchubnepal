@@ -19,6 +19,25 @@
                                 @case('favorite-removed') Removed from favorites. @break
                                 @case('calculation-saved') Calculation saved. @break
                                 @case('saved-deleted') Saved calculation deleted. @break
+                                @case('qr-updated') Dynamic QR updated. @break
+                                @case('qr-deleted') Dynamic QR deleted. @break
+                                @case('qr-paused') Dynamic QR paused. @break
+                                @case('qr-resumed') Dynamic QR resumed. @break
+                                @case('workspace-created') Workspace created. @break
+                                @case('workspace-updated') Workspace updated. @break
+                                @case('member-invited') Team member invited. @break
+                                @case('member-updated') Member role updated. @break
+                                @case('member-removed') Member removed. @break
+                                @case('template-created') Brand template saved. @break
+                                @case('template-deleted') Brand template deleted. @break
+                                @case('campaign-created') Campaign created. @break
+                                @case('campaign-deleted') Campaign deleted. @break
+                                @case('bulk-completed') Bulk QR job completed. Download your ZIP below. @break
+                                @case('api-key-created') API key created — copy it now; it won’t be shown again. @break
+                                @case('api-key-toggled') API key status updated. @break
+                                @case('api-key-updated') API key status updated. @break
+                                @case('api-key-deleted') API key deleted. @break
+                                @case('api-key-revoked') API key revoked. @break
                                 @default {{ session('status') }}
                             @endswitch
                         </div>

@@ -150,6 +150,46 @@ class User extends Authenticatable
         return $this->hasMany(CalculationHistory::class);
     }
 
+    public function qrCodes(): HasMany
+    {
+        return $this->hasMany(QrCode::class);
+    }
+
+    public function dynamicQrCodes(): HasMany
+    {
+        return $this->qrCodes()->where('is_dynamic', true);
+    }
+
+    public function qrWorkspaces(): HasMany
+    {
+        return $this->hasMany(QrWorkspace::class, 'owner_id');
+    }
+
+    public function qrWorkspaceMemberships(): HasMany
+    {
+        return $this->hasMany(QrWorkspaceMember::class);
+    }
+
+    public function qrBrandTemplates(): HasMany
+    {
+        return $this->hasMany(QrBrandTemplate::class);
+    }
+
+    public function qrCampaigns(): HasMany
+    {
+        return $this->hasMany(QrCampaign::class);
+    }
+
+    public function qrBulkJobs(): HasMany
+    {
+        return $this->hasMany(QrBulkJob::class);
+    }
+
+    public function canUseQrEnterprise(): bool
+    {
+        return $this->isPremiumActive() || $this->isSubscribed();
+    }
+
     public function advertiser(): HasOne
     {
         return $this->hasOne(Advertiser::class);

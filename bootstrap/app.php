@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureUserIsAdmin::class,
             'advertiser' => EnsureUserIsAdvertiser::class,
             'permission' => CheckPermission::class,
+            'api.key' => \App\Http\Middleware\AuthenticateApiKeyOrSanctum::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -31,6 +31,27 @@
         <a class="nav-link {{ request()->routeIs('account.favorites.*') ? 'active' : '' }}" href="{{ route('account.favorites.index') }}">
             <i class="bi bi-heart"></i> Favorites
         </a>
+        <a class="nav-link {{ request()->routeIs('account.qr-enterprise') ? 'active' : '' }}" href="{{ route('account.qr-enterprise') }}">
+            <i class="bi bi-graph-up-arrow"></i> QR Enterprise
+        </a>
+        <a class="nav-link {{ request()->routeIs('account.qr-codes.*') ? 'active' : '' }}" href="{{ route('account.qr-codes.index') }}">
+            <i class="bi bi-qr-code"></i> Dynamic QR
+        </a>
+        <a class="nav-link {{ request()->routeIs('account.workspaces.*') ? 'active' : '' }}" href="{{ route('account.workspaces.index') }}">
+            <i class="bi bi-people"></i> Workspaces
+        </a>
+        <a class="nav-link {{ request()->routeIs('account.campaigns.*') ? 'active' : '' }}" href="{{ route('account.campaigns.index') }}">
+            <i class="bi bi-flag"></i> Campaigns
+        </a>
+        <a class="nav-link {{ request()->routeIs('account.brand-templates.*') ? 'active' : '' }}" href="{{ route('account.brand-templates.index') }}">
+            <i class="bi bi-palette"></i> Brand Templates
+        </a>
+        <a class="nav-link {{ request()->routeIs('account.bulk-qr.*') ? 'active' : '' }}" href="{{ route('account.bulk-qr.index') }}">
+            <i class="bi bi-file-zip"></i> Bulk QR
+        </a>
+        <a class="nav-link {{ request()->routeIs('account.api-keys.*') ? 'active' : '' }}" href="{{ route('account.api-keys.index') }}">
+            <i class="bi bi-key"></i> API Keys
+        </a>
         <a class="nav-link {{ request()->routeIs('account.subscription') ? 'active' : '' }}" href="{{ route('account.subscription') }}">
             <i class="bi bi-credit-card"></i> Subscription
         </a>

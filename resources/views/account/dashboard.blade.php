@@ -78,6 +78,7 @@
                 </div>
                 <div class="d-grid gap-2">
                     <a href="{{ route('account.saved.index') }}" class="btn btn-soft text-start"><i class="bi bi-bookmark-star me-2"></i> Saved results</a>
+                    <a href="{{ route('account.qr-codes.index') }}" class="btn btn-soft text-start"><i class="bi bi-qr-code me-2"></i> Dynamic QR codes</a>
                     <a href="{{ route('account.favorites.index') }}" class="btn btn-soft text-start"><i class="bi bi-heart me-2"></i> Favorites</a>
                     <a href="{{ route('account.subscription') }}" class="btn btn-soft text-start"><i class="bi bi-credit-card me-2"></i> Manage plan</a>
                     <a href="{{ route('account.profile.edit') }}" class="btn btn-soft text-start"><i class="bi bi-person-gear me-2"></i> Edit profile</a>

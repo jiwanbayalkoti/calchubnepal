@@ -17,21 +17,33 @@ class BlogController extends Controller
 
     public function index(Request $request): View
     {
-        $query = BlogPost::query()->published()->with(['category', 'author']);
+        // Include scheduled QR guides (related_qr_type) so the blog index lists every QR guide.
+        $query = BlogPost::query()
+            ->where('status', BlogPost::STATUS_PUBLISHED)
+            ->where(function ($q) {
+                $q->where('published_at', '<=', now())
+                    ->orWhereNotNull('related_qr_type');
+            })
+            ->with(['category', 'author']);
 
         if ($categorySlug = $request->query('category')) {
             $query->whereHas('category', fn ($q) => $q->where('slug', $categorySlug));
         }
 
-        $posts = $query->latest('published_at')->paginate(9)->withQueryString();
+        $posts = $query->latest('published_at')->paginate(12)->withQueryString();
 
-        $featured = BlogPost::query()->published()->featured()->latest('published_at')->first();
+        $featured = BlogPost::query()
+            ->where('status', BlogPost::STATUS_PUBLISHED)
+            ->where('published_at', '<=', now())
+            ->featured()
+            ->latest('published_at')
+            ->first();
 
         $categories = BlogCategory::query()->active()->orderBy('name')->get();
 
         $meta = $this->seo->buildMeta(null, [
-            'title' => 'Blog — AI Calculator Hub',
-            'description' => 'Guides, tips and explainers on finance, health, construction and everyday math from the AI Calculator Hub team.',
+            'title' => 'Blog — CalchubNepal',
+            'description' => 'Guides for calculators and QR codes — WiFi, WhatsApp, eSewa, maps, bank details and more.',
             'canonical' => route('blog.index'),
         ]);
 
@@ -45,7 +57,11 @@ class BlogController extends Controller
 
     public function show(BlogPost $post): View
     {
-        abort_unless($post->isPublished(), 404);
+        $visible = $post->status === BlogPost::STATUS_PUBLISHED
+            && $post->published_at !== null
+            && ($post->published_at->lte(now()) || filled($post->related_qr_type));
+
+        abort_unless($visible, 404);
 
         $post->incrementViews();
 

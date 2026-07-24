@@ -13,6 +13,7 @@ use App\Models\SubscriptionPlan;
 use App\Notifications\Admin\ContactMessageReceived;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Admin\AdminNotifier;
+use App\Services\Seo\PublicSitemapService;
 use App\Services\Seo\SeoService;
 use App\Support\CatalogStatsCache;
 use Illuminate\Http\JsonResponse;
@@ -26,6 +27,7 @@ class PageController extends Controller
         protected SeoService $seo,
         protected ActivityLogService $activity,
         protected AdminNotifier $notifier,
+        protected PublicSitemapService $publicSitemap,
     ) {
     }
 
@@ -144,8 +146,8 @@ class PageController extends Controller
             ->get(['id', 'title', 'slug']);
 
         $meta = $this->seo->buildMeta(null, [
-            'title' => 'Sitemap — AI Calculator Hub',
-            'description' => 'HTML sitemap of AI Calculator Hub pages, categories, calculators and blog posts.',
+            'title' => 'Sitemap — CalchubNepal',
+            'description' => 'HTML sitemap of CalchubNepal — calculators, free tools (QR & visiting card), categories, blog and legal pages.',
             'canonical' => route('sitemap'),
         ]);
 
@@ -154,25 +156,12 @@ class PageController extends Controller
             'categories' => $categories,
             'calculators' => $calculators,
             'posts' => $posts,
-            'mainLinks' => [
-                ['label' => 'Home', 'url' => route('home')],
-                ['label' => 'All Calculators', 'url' => route('calculators.index')],
-                ['label' => 'Categories', 'url' => route('categories.index')],
-                ['label' => 'Blog', 'url' => route('blog.index')],
-                ['label' => 'Pricing', 'url' => route('pricing')],
-                ['label' => 'About Us', 'url' => route('about')],
-                ['label' => 'Contact', 'url' => route('contact')],
-                ['label' => 'Search', 'url' => route('search.results')],
-            ],
-            'legalLinks' => [
-                ['label' => 'Privacy Policy', 'url' => route('privacy')],
-                ['label' => 'Terms & Conditions', 'url' => route('terms')],
-                ['label' => 'Cookie Policy', 'url' => route('cookies')],
-                ['label' => 'Disclaimer', 'url' => route('disclaimer')],
-                ['label' => 'XML Sitemap', 'url' => route('sitemap.xml')],
-                ['label' => 'Login', 'url' => route('login')],
-                ['label' => 'Register', 'url' => route('register')],
-            ],
+            'mainLinks' => $this->publicSitemap->linksForGroup('main'),
+            'toolLinks' => $this->publicSitemap->linksForGroup('tools'),
+            'legalLinks' => array_merge(
+                $this->publicSitemap->linksForGroup('legal'),
+                $this->publicSitemap->accountLinks(),
+            ),
         ]);
     }
 

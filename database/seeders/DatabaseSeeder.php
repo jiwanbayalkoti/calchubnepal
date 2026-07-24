@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             CatalogExpansionSeeder::class,
             BlogSeeder::class,
             TopCalculatorBlogSeeder::class,
+            QrGuideBlogSeeder::class,
             AdvertisementSeeder::class,
             SeoPageSeeder::class,
         ]);

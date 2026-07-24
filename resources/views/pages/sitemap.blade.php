@@ -16,14 +16,14 @@
                 <span class="hero-eyebrow"><i class="bi bi-diagram-3"></i> Sitemap</span>
                 <h1 class="h2 mb-2">Browse the site</h1>
                 <p class="text-muted-custom mb-0">
-                    Find every main page and calculator category.
+                    Find every main page, free tool, and calculator category.
                     Prefer XML for search engines?
                     <a href="{{ route('sitemap.xml') }}">Download sitemap.xml</a>
                 </p>
             </header>
 
             <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-3">
                     <div class="card-surface p-4 h-100">
                         <h2 class="h5 mb-3">Main pages</h2>
                         <ul class="list-unstyled sitemap-list mb-0">
@@ -34,7 +34,18 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card-surface p-4 h-100">
+                        <h2 class="h5 mb-3">Free tools</h2>
+                        <ul class="list-unstyled sitemap-list mb-0">
+                            @foreach ($toolLinks as $link)
+                                <li class="mb-2"><a href="{{ $link['url'] }}">{{ $link['label'] }}</a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
                     <div class="card-surface p-4 h-100">
                         <h2 class="h5 mb-3">Legal &amp; account</h2>
                         <ul class="list-unstyled sitemap-list mb-0">
@@ -45,7 +56,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-3">
                     <div class="card-surface p-4 h-100">
                         <h2 class="h5 mb-3">Categories</h2>
                         <ul class="list-unstyled sitemap-list mb-0">

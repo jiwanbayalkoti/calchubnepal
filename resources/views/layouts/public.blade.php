@@ -66,6 +66,8 @@
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('calculators.*') ? 'active' : '' }}" href="{{ route('calculators.index') }}">{{ __('nav.calculators') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">{{ __('nav.categories') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('blog.*') ? 'active' : '' }}" href="{{ route('blog.index') }}">{{ __('nav.blog') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('qr-code-generator*') ? 'active' : '' }}" href="{{ route('qr-code-generator') }}">{{ __('nav.qr') }}</a></li>
+                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('visiting-card-designer*') ? 'active' : '' }}" href="{{ route('visiting-card-designer') }}">{{ __('nav.visiting_card') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">{{ __('nav.about') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('pricing') ? 'active' : '' }}" href="{{ route('pricing') }}">{{ __('nav.pricing') }}</a></li>
                     <li class="nav-item"><a class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">{{ __('nav.contact') }}</a></li>
@@ -170,6 +172,8 @@
                 <h6>{{ __('footer.company') }}</h6>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ route('about') }}">{{ __('footer.about') }}</a></li>
+                    <li class="mb-2"><a href="{{ route('qr-code-generator') }}">{{ __('footer.qr') }}</a></li>
+                    <li class="mb-2"><a href="{{ route('visiting-card-designer') }}">{{ __('footer.visiting_card') }}</a></li>
                     <li class="mb-2"><a href="{{ route('pricing') }}">{{ __('footer.pricing') }}</a></li>
                     <li class="mb-2"><a href="{{ route('blog.index') }}">{{ __('footer.blog') }}</a></li>
                     <li class="mb-2"><a href="{{ route('contact') }}">{{ __('footer.contact') }}</a></li>
