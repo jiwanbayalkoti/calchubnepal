@@ -90,6 +90,14 @@ class BlogSeeder extends Seeder
                 'meta_description' => 'Guides for aana/sqm conversion, driving licence fees, Dashain allowance and other Nepal everyday math.',
                 'sort_order' => 6,
             ],
+            [
+                'name' => 'Visiting Card Generator',
+                'slug' => 'visiting-card-generator',
+                'description' => 'Guides for designing, printing and sharing professional visiting cards with CalchubNepal templates.',
+                'meta_title' => 'Visiting Card Generator Guides | CalchubNepal',
+                'meta_description' => 'Learn how to design printable visiting cards, choose templates, and create professional business cards online.',
+                'sort_order' => 7,
+            ],
         ];
 
         $ids = [];

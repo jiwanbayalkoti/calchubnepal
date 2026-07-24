@@ -17,6 +17,94 @@
 @endpush
 
 @section('content')
+    <div class="card mb-3 border-primary">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-robot"></i> AI Blog Writer</span>
+            <small class="opacity-75">Admin instruction → review → save / publish</small>
+        </div>
+        <div class="card-body">
+            <form id="aiBlogForm" autocomplete="off">
+                <div class="form-group">
+                    <label>Instructions for AI <span class="required-star">*</span></label>
+                    <textarea name="instructions" id="aiInstructions" class="form-control" rows="4" required
+                        placeholder="Example: Write a practical guide on how to generate a WiFi QR code for cafes in Nepal. Include steps, common mistakes, and a CTA to CalchubNepal QR generator. Keep language simple."></textarea>
+                    <div class="invalid-feedback" data-error-for="instructions"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>Title hint (optional)</label>
+                        <input type="text" name="title_hint" class="form-control" placeholder="Suggested title direction">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Primary keyword</label>
+                        <input type="text" name="keyword" class="form-control" placeholder="wifi qr code nepal">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Category</label>
+                        <select name="category_id" class="form-control">
+                            <option value="">Auto / General</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group">
+                        <label>Language</label>
+                        <select name="language" class="form-control">
+                            <option value="en">English</option>
+                            <option value="ne">Nepali</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Tone</label>
+                        <select name="tone" class="form-control">
+                            <option value="clear, helpful, professional">Professional</option>
+                            <option value="friendly and conversational">Friendly</option>
+                            <option value="practical how-to">How-to / Practical</option>
+                            <option value="SEO-focused educational">SEO Educational</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Word count</label>
+                        <select name="word_count" class="form-control">
+                            <option value="700">~700</option>
+                            <option value="900" selected>~900</option>
+                            <option value="1200">~1200</option>
+                            <option value="1500">~1500</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Related tool name</label>
+                        <input type="text" name="calculator_title" class="form-control" placeholder="QR Code Generator">
+                    </div>
+                </div>
+                <div class="row align-items-end">
+                    <div class="col-md-4 form-group mb-md-0">
+                        <label>After generate</label>
+                        <select name="save_mode" id="aiSaveMode" class="form-control">
+                            <option value="fill">Fill editor (review first)</option>
+                            <option value="draft">Save as Draft</option>
+                            <option value="published">Publish now</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group mb-md-0" id="aiPublishAtWrap" style="display:none;">
+                        <label>Publish date (optional)</label>
+                        <input type="datetime-local" name="published_at" class="form-control">
+                        <small class="text-muted">Empty = publish immediately</small>
+                    </div>
+                    <div class="col-md-4 form-group mb-0 text-md-right">
+                        <button type="submit" class="btn btn-primary" id="btnGenerateAi">
+                            <i class="fas fa-magic"></i> Generate with AI
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div id="aiBlogStatus" class="mt-3 small text-muted" style="display:none;"></div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <select id="filterStatus" class="form-control form-control-sm" style="width:180px;">
@@ -52,6 +140,7 @@
             <div class="modal-content" style="max-height: calc(100vh - 3.5rem); display: flex; flex-direction: column;">
                 <form id="postForm" autocomplete="off" style="display: flex; flex-direction: column; min-height: 0; flex: 1;">
                     <input type="hidden" name="id">
+                    <input type="hidden" name="ai_generated" id="postAiGenerated" value="0">
                     <div class="modal-header flex-shrink-0">
                         <h5 class="modal-title">Blog Post</h5>
                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
@@ -130,6 +219,10 @@
                             <label>Meta Title</label>
                             <input type="text" name="meta_title" class="form-control">
                         </div>
+                        <div class="form-group">
+                            <label>Meta Keywords</label>
+                            <input type="text" name="meta_keywords" class="form-control" placeholder="keyword1, keyword2">
+                        </div>
                         <div class="form-group mb-0">
                             <label>Meta Description</label>
                             <textarea name="meta_description" class="form-control" rows="2"></textarea>
@@ -191,9 +284,81 @@ $(function () {
 
     initEditor();
 
-    // Keep textarea in sync before AJAX serialize
     $('#postForm').on('submit', function () {
         syncEditorToTextarea();
+    });
+
+    $('#aiSaveMode').on('change', function () {
+        $('#aiPublishAtWrap').toggle($(this).val() === 'published');
+    });
+
+    function clearAiErrors() {
+        $('#aiBlogForm .is-invalid').removeClass('is-invalid');
+        $('#aiBlogForm .invalid-feedback').text('');
+    }
+
+    function fillPostFromAi(data) {
+        const $form = $('#postForm');
+        $form.find('[name="id"]').val('');
+        $form.find('[name="title"]').val(data.title || '');
+        $form.find('[name="slug"]').val(data.slug || '');
+        $form.find('[name="excerpt"]').val(data.excerpt || '');
+        $form.find('[name="meta_title"]').val(data.meta_title || '');
+        $form.find('[name="meta_description"]').val(data.meta_description || '');
+        $form.find('[name="meta_keywords"]').val(data.meta_keywords || '');
+        $form.find('[name="status"]').val('draft');
+        $form.find('[name="blog_category_id"]').val(data.blog_category_id || '').trigger('change');
+        const tags = Array.isArray(data.tags) ? data.tags.join(', ') : (data.tags || '');
+        $form.find('[name="tags"]').val(tags);
+        $('#postAiGenerated').val('1');
+        setEditorData(data.content || '');
+        $('#postModal .modal-title').text('AI Blog — Review & Save');
+        $('#postModal').modal('show');
+    }
+
+    $('#aiBlogForm').on('submit', function (e) {
+        e.preventDefault();
+        clearAiErrors();
+
+        const $btn = $('#btnGenerateAi');
+        const original = $btn.html();
+        const saveMode = $('#aiSaveMode').val() || 'fill';
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating…');
+        $('#aiBlogStatus').show().removeClass('text-danger text-success').addClass('text-muted')
+            .text('Calling AI… this can take 15–40 seconds.');
+
+        $.ajax({
+            url: '{{ route("admin.blog-posts.generate-ai") }}',
+            method: 'POST',
+            data: $(this).serialize(),
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+        }).done(function (res) {
+            toastr.success(res.message || 'AI blog ready.');
+            $('#aiBlogStatus').removeClass('text-muted text-danger').addClass('text-success')
+                .text(res.message || 'Done.');
+
+            if (saveMode === 'fill' && res.data) {
+                fillPostFromAi(res.data);
+            } else {
+                AdminCRUD.reload();
+            }
+        }).fail(function (xhr) {
+            const json = xhr.responseJSON || {};
+            let msg = json.message || 'AI generation failed.';
+            if (json.errors) {
+                Object.keys(json.errors).forEach((key) => {
+                    const $field = $('#aiBlogForm [name="' + key + '"]');
+                    $field.addClass('is-invalid');
+                    $field.siblings('.invalid-feedback').text(json.errors[key][0]);
+                    $('#aiBlogForm [data-error-for="' + key + '"]').text(json.errors[key][0]);
+                });
+                msg = Object.values(json.errors)[0][0] || msg;
+            }
+            toastr.error(msg);
+            $('#aiBlogStatus').removeClass('text-muted text-success').addClass('text-danger').text(msg);
+        }).always(function () {
+            $btn.prop('disabled', false).html(original);
+        });
     });
 
     AdminCRUD.initDataTable('#postsTable', {
@@ -226,6 +391,7 @@ $(function () {
     $('#btnAddPost').on('click', function (e) {
         e.preventDefault();
         AdminCRUD.openCreate('#postModal', '#postForm', 'Add Blog Post');
+        $('#postAiGenerated').val('0');
         setEditorData('');
     });
 
@@ -239,6 +405,7 @@ $(function () {
     AdminCRUD.bindEdit('.btn-edit', (id) => `{{ url('admin/blog-posts') }}/${id}`, '#postForm', '#postModal', function (data, formSelector) {
         AdminCRUD.autoFill(formSelector, data);
         setEditorData(data.content || '');
+        $('#postAiGenerated').val(data.ai_generated ? '1' : '0');
         $('#postModal .modal-title').text('Edit Blog Post');
     });
 

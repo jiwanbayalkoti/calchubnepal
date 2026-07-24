@@ -54,6 +54,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->parameters(['categories' => 'id']);
 
     Route::get('blog-posts/data', [BlogPostController::class, 'data'])->name('blog-posts.data');
+    Route::post('blog-posts/generate-ai', [BlogPostController::class, 'generateWithAi'])->name('blog-posts.generate-ai');
     Route::resource('blog-posts', BlogPostController::class)
         ->except(['create', 'edit'])
         ->parameters(['blog-posts' => 'id']);

@@ -20,6 +20,12 @@ class BlogPostRequest extends FormRequest
             ]);
         }
 
+        if ($this->has('ai_generated')) {
+            $this->merge([
+                'ai_generated' => filter_var($this->input('ai_generated'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false,
+            ]);
+        }
+
         $tags = $this->input('tags');
 
         if (is_string($tags)) {
@@ -49,6 +55,7 @@ class BlogPostRequest extends FormRequest
             'status' => ['required', Rule::in(['draft', 'published', 'archived'])],
             'published_at' => ['nullable', 'date'],
             'is_featured' => ['nullable', 'boolean'],
+            'ai_generated' => ['nullable', 'boolean'],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['string', 'max:255'],
         ];

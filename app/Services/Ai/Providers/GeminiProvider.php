@@ -38,25 +38,43 @@ class GeminiProvider implements AiProviderInterface
         $model = $options['model'] ?? $this->config['model'] ?? 'gemini-1.5-flash';
         $baseUrl = rtrim($this->config['base_url'] ?? 'https://generativelanguage.googleapis.com/v1beta', '/');
 
+        $generationConfig = array_filter([
+            'temperature' => $options['temperature'] ?? 0.7,
+            'maxOutputTokens' => $options['max_tokens'] ?? null,
+        ], static fn ($value) => $value !== null);
+
+        // Thinking models (gemini-flash-latest) can burn most of maxOutputTokens on
+        // thoughts and truncate the blog JSON mid-sentence. Cap thinking budget.
+        // Note: thinkingBudget=0 is rejected by the API for some models.
+        if (! empty($options['disable_thinking'])) {
+            $generationConfig['thinkingConfig'] = [
+                'thinkingBudget' => (int) ($options['thinking_budget'] ?? 512),
+            ];
+        }
+
         $response = Http::timeout((int) ($this->config['timeout'] ?? 30))
-            ->post("{$baseUrl}/models/{$model}:generateContent?key={$apiKey}", array_filter([
+            ->post("{$baseUrl}/models/{$model}:generateContent?key={$apiKey}", [
                 'contents' => [
                     ['parts' => [['text' => $prompt]]],
                 ],
-                'generationConfig' => array_filter([
-                    'temperature' => $options['temperature'] ?? 0.7,
-                    'maxOutputTokens' => $options['max_tokens'] ?? null,
-                ], static fn ($value) => $value !== null),
-            ]));
+                'generationConfig' => $generationConfig,
+            ]);
 
         if ($response->failed()) {
             throw new RuntimeException('Gemini request failed: '.$response->body());
         }
 
         $data = $response->json() ?? [];
+        $parts = $data['candidates'][0]['content']['parts'] ?? [];
+        $content = '';
+        foreach ($parts as $part) {
+            if (! empty($part['text'])) {
+                $content .= (string) $part['text'];
+            }
+        }
 
         return [
-            'content' => (string) ($data['candidates'][0]['content']['parts'][0]['text'] ?? ''),
+            'content' => $content,
             'tokens_used' => $data['usageMetadata']['totalTokenCount'] ?? null,
             'raw' => $data,
         ];
