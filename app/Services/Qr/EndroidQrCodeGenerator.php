@@ -32,6 +32,10 @@ class EndroidQrCodeGenerator implements QrCodeGeneratorInterface
             throw new InvalidArgumentException('QR payload is empty.');
         }
 
+        if (! extension_loaded('gd')) {
+            throw new InvalidArgumentException('PHP GD extension is required to generate QR codes. Enable ext-gd on the server.');
+        }
+
         $needsRasterStyle = $options->frameStyle !== QrFrameStyle::None
             || $options->moduleStyle !== QrModuleStyle::Square
             || $options->eyeStyle->value !== 'square'

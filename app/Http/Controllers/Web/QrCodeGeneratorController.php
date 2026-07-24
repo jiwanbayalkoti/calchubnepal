@@ -75,7 +75,7 @@ class QrCodeGeneratorController extends Controller
         $recent = $this->qr->repository()->recentFor(Auth::id(), session()->getId(), 8);
 
         $qrGuideBlogs = BlogPost::query()
-            ->where('status', BlogPost::STATUS_PUBLISHED)
+            ->published()
             ->whereNotNull('related_qr_type')
             ->orderBy('published_at')
             ->get(['id', 'title', 'slug', 'excerpt', 'content', 'related_qr_type', 'reading_time_minutes', 'published_at', 'meta_keywords'])
@@ -88,7 +88,6 @@ class QrCodeGeneratorController extends Controller
                         'url' => route('blog.show', $post),
                         'reading_time' => (int) $post->reading_time_minutes,
                         'keywords' => $post->meta_keywords,
-                        'is_live' => $post->published_at !== null && $post->published_at->lte(now()),
                         'published_at' => optional($post->published_at)->toDateString(),
                     ],
                 ];
@@ -174,7 +173,20 @@ class QrCodeGeneratorController extends Controller
         } catch (Throwable $e) {
             report($e);
 
-            return response()->json(['success' => false, 'message' => 'Unable to generate QR code. Please check your inputs.'], 500);
+            $message = 'Unable to generate QR code. Please check your inputs.';
+            if (config('app.debug')) {
+                $message = $e->getMessage();
+            } elseif (str_contains($e->getMessage(), 'GD') || str_contains($e->getMessage(), 'gd')) {
+                $message = $e->getMessage();
+            } elseif (! class_exists(\Endroid\QrCode\Builder\Builder::class)) {
+                $message = 'QR library missing on server. Run composer install.';
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'error_class' => class_basename($e),
+            ], 500);
         }
     }
 

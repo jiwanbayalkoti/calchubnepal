@@ -35,7 +35,7 @@ final class QrGenerateResult
             'size' => $this->size,
             'mime_type' => $this->mimeType,
             'image' => $this->dataUri(),
-            'characters' => mb_strlen($this->payload),
+            'characters' => function_exists('mb_strlen') ? mb_strlen($this->payload) : strlen($this->payload),
         ];
     }
 }

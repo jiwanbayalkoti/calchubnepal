@@ -17,13 +17,8 @@ class BlogController extends Controller
 
     public function index(Request $request): View
     {
-        // Include scheduled QR guides (related_qr_type) so the blog index lists every QR guide.
         $query = BlogPost::query()
-            ->where('status', BlogPost::STATUS_PUBLISHED)
-            ->where(function ($q) {
-                $q->where('published_at', '<=', now())
-                    ->orWhereNotNull('related_qr_type');
-            })
+            ->published()
             ->with(['category', 'author']);
 
         if ($categorySlug = $request->query('category')) {
@@ -33,8 +28,7 @@ class BlogController extends Controller
         $posts = $query->latest('published_at')->paginate(12)->withQueryString();
 
         $featured = BlogPost::query()
-            ->where('status', BlogPost::STATUS_PUBLISHED)
-            ->where('published_at', '<=', now())
+            ->published()
             ->featured()
             ->latest('published_at')
             ->first();
@@ -57,11 +51,7 @@ class BlogController extends Controller
 
     public function show(BlogPost $post): View
     {
-        $visible = $post->status === BlogPost::STATUS_PUBLISHED
-            && $post->published_at !== null
-            && ($post->published_at->lte(now()) || filled($post->related_qr_type));
-
-        abort_unless($visible, 404);
+        abort_unless($post->isPublished(), 404);
 
         $post->incrementViews();
 

@@ -76,9 +76,7 @@
     if (meta) {
       const bits = [];
       if (guide.reading_time) bits.push(guide.reading_time + ' min read');
-      if (guide.published_at) {
-        bits.push(guide.is_live ? 'Published ' + guide.published_at : 'Scheduled ' + guide.published_at);
-      }
+      if (guide.published_at) bits.push('Published ' + guide.published_at);
       if (guide.keywords) bits.push(guide.keywords.split(',').slice(0, 3).join(',').trim());
       meta.textContent = bits.join(' · ');
     }
