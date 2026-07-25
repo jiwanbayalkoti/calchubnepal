@@ -141,6 +141,92 @@ class AnalyticsController extends Controller
 
         $countryKnownShare = round((($views30 - $unknownCountryViews) / $views30) * 100, 1);
 
+        $since30m = Carbon::now()->subMinutes(30);
+        $realtimeActiveUsers = $this->countSiteViews(fn ($q) => $q->where('created_at', '>=', $since30m));
+        $realtimePageViews = PageView::query()->where('created_at', '>=', $since30m)->count();
+
+        $realtimePerMinute = array_fill(0, 30, 0);
+        $realtimeMinuteLabels = [];
+        $minuteIndex = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $minute = Carbon::now()->subMinutes($i)->startOfMinute();
+            $key = $minute->format('Y-m-d H:i');
+            $realtimeMinuteLabels[] = $minute->format('H:i');
+            $minuteIndex[$key] = 29 - $i;
+        }
+
+        PageView::query()
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d %H:%i') as minute_key, COUNT(*) as views")
+            ->where('created_at', '>=', $since30m)
+            ->groupBy('minute_key')
+            ->get()
+            ->each(function ($row) use (&$realtimePerMinute, $minuteIndex) {
+                $idx = $minuteIndex[$row->minute_key] ?? null;
+                if ($idx !== null) {
+                    $realtimePerMinute[$idx] = (int) $row->views;
+                }
+            });
+
+        $realtimeTopCountries = PageView::query()
+            ->select(
+                'country',
+                DB::raw("COUNT(DISTINCT COALESCE(NULLIF(session_id, ''), ip_hash)) as visitors")
+            )
+            ->where('created_at', '>=', $since30m)
+            ->whereNotNull('country')
+            ->where('country', '!=', '')
+            ->groupBy('country')
+            ->orderByDesc('visitors')
+            ->limit(5)
+            ->get()
+            ->map(function ($row) {
+                $code = strtoupper((string) $row->country);
+
+                return (object) [
+                    'code' => $code,
+                    'name' => self::COUNTRY_NAMES[$code] ?? $code,
+                    'flag' => $this->countryFlagEmoji($code),
+                    'visitors' => (int) $row->visitors,
+                ];
+            });
+
+        $deviceTotal = max(1, (int) $deviceSplit->sum());
+        $deviceRows = $deviceSplit->map(function ($views, $device) use ($deviceTotal) {
+            return (object) [
+                'label' => ucfirst($device ?: 'unknown'),
+                'views' => (int) $views,
+                'share' => round(($views / $deviceTotal) * 100, 1),
+            ];
+        })->values();
+
+        $referrerRows = PageView::query()
+            ->select('referrer', DB::raw('COUNT(*) as views'))
+            ->where('created_at', '>=', $since30)
+            ->whereNotNull('referrer')
+            ->where('referrer', '!=', '')
+            ->groupBy('referrer')
+            ->orderByDesc('views')
+            ->limit(40)
+            ->get()
+            ->map(function ($row) {
+                $host = $this->referrerHost((string) $row->referrer);
+
+                return (object) [
+                    'host' => $host,
+                    'views' => (int) $row->views,
+                ];
+            })
+            ->groupBy('host')
+            ->map(fn (Collection $items, $host) => (object) [
+                'host' => $host,
+                'views' => (int) $items->sum('views'),
+            ])
+            ->sortByDesc('views')
+            ->take(8)
+            ->values();
+
+        $referrerMax = max(1, (int) ($referrerRows->first()->views ?? 1));
+
         $recentVisits = PageView::query()
             ->where('created_at', '>=', Carbon::now()->subDays(7))
             ->latest('created_at')
@@ -154,10 +240,18 @@ class AnalyticsController extends Controller
             'usageSummary',
             'popularPages',
             'deviceSplit',
+            'deviceRows',
             'countryRows',
             'unknownCountryViews',
             'countryKnownShare',
             'views30',
+            'realtimeActiveUsers',
+            'realtimePageViews',
+            'realtimePerMinute',
+            'realtimeMinuteLabels',
+            'realtimeTopCountries',
+            'referrerRows',
+            'referrerMax',
             'recentVisits',
         ));
     }
@@ -217,6 +311,19 @@ class AnalyticsController extends Controller
         );
 
         return implode('', $chars);
+    }
+
+    protected function referrerHost(string $referrer): string
+    {
+        $host = parse_url($referrer, PHP_URL_HOST);
+
+        if (! is_string($host) || $host === '') {
+            return 'Direct / unknown';
+        }
+
+        $host = Str::lower($host);
+
+        return Str::startsWith($host, 'www.') ? Str::substr($host, 4) : $host;
     }
 
     /**

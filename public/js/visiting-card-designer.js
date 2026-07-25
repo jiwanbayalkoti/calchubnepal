@@ -371,5 +371,30 @@
   syncTemplates();
   const checkedTemplate = form.querySelector('input[name="template"]:checked');
   applyTemplateColors(checkedTemplate);
+
+  // Deep-link: /visiting-card-designer?template=classic or ?style=Professional
+  (function applyDeepLinkFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    const template = params.get('template');
+    const style = params.get('style');
+
+    if (template) {
+      const input = form.querySelector('input[name="template"][value="' + template.replace(/"/g, '') + '"]');
+      if (input) {
+        input.checked = true;
+        syncTemplates();
+        applyTemplateColors(input);
+        filterTemplates(input.closest('.vc-template-card')?.dataset.category || 'all');
+        input.closest('.vc-template-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    if (style) {
+      filterTemplates(style);
+      document.getElementById('vcTemplateFilters')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  })();
+
   schedulePreview();
 })(jQuery);

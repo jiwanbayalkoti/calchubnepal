@@ -592,6 +592,17 @@
 
   syncTypeFields();
 
+  // Deep-link: /qr-code-generator?type=wifi
+  (function applyTypeFromQuery() {
+    const type = new URLSearchParams(window.location.search).get('type');
+    if (!type) return;
+    const input = form.querySelector('input[name="type"][value="' + type.replace(/"/g, '') + '"]');
+    if (!input) return;
+    input.checked = true;
+    syncTypeFields();
+    input.closest('.qr-type-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  })();
+
   const dynamicToggle = document.getElementById('qr_is_dynamic');
   const dynamicFields = document.getElementById('qrDynamicFields');
   const dynamicStatus = document.getElementById('qrDynamicStatus');

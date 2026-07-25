@@ -52,6 +52,98 @@
   initTheme();
 
   /* ------------------------------------------------------------------ */
+  /* Nav dropdowns: hover on desktop, tap on mobile                     */
+  /* ------------------------------------------------------------------ */
+
+  function isDesktopNav() {
+    return window.matchMedia('(min-width: 992px)').matches;
+  }
+
+  function openNavDropdown($item) {
+    $('.js-nav-dropdown.is-open').not($item).each(function () {
+      closeNavDropdown($(this));
+    });
+    $item.addClass('is-open');
+    $item.children('.dropdown-toggle').attr('aria-expanded', 'true');
+  }
+
+  function closeNavDropdown($item) {
+    $item.removeClass('is-open');
+    $item.children('.dropdown-toggle').attr('aria-expanded', 'false');
+    $item.find('.js-nav-flyout.is-open, .js-nav-flyout-nested.is-open').removeClass('is-open');
+  }
+
+  $(document).on('mouseenter', '.js-nav-dropdown', function () {
+    if (!isDesktopNav()) return;
+    openNavDropdown($(this));
+  });
+
+  $(document).on('mouseleave', '.js-nav-dropdown', function () {
+    if (!isDesktopNav()) return;
+    closeNavDropdown($(this));
+  });
+
+  $(document).on('click', '.js-nav-dropdown > .dropdown-toggle', function (e) {
+    e.preventDefault();
+    if (isDesktopNav()) return;
+
+    const $item = $(this).closest('.js-nav-dropdown');
+    if ($item.hasClass('is-open')) {
+      closeNavDropdown($item);
+    } else {
+      openNavDropdown($item);
+    }
+  });
+
+  // Mobile: tap parent row to expand nested tools list
+  $(document).on('click', '.js-nav-flyout > .has-flyout', function (e) {
+    if (isDesktopNav()) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const $flyout = $(this).closest('.js-nav-flyout');
+    $flyout.siblings('.js-nav-flyout').removeClass('is-open').find('.js-nav-flyout-nested').removeClass('is-open');
+    $flyout.toggleClass('is-open');
+  });
+
+  // Mobile: tap card style to reveal templates
+  $(document).on('click', '.js-nav-flyout-nested > .has-nested', function (e) {
+    if (isDesktopNav()) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const $nested = $(this).closest('.js-nav-flyout-nested');
+    $nested.siblings('.js-nav-flyout-nested').removeClass('is-open');
+    $nested.toggleClass('is-open');
+  });
+
+  $(document).on('mouseenter', '.js-nav-flyout', function () {
+    if (!isDesktopNav()) return;
+    $(this).addClass('is-open').siblings('.js-nav-flyout').removeClass('is-open')
+      .find('.js-nav-flyout-nested').removeClass('is-open');
+  });
+
+  $(document).on('mouseleave', '.js-nav-flyout', function () {
+    if (!isDesktopNav()) return;
+    $(this).removeClass('is-open').find('.js-nav-flyout-nested').removeClass('is-open');
+  });
+
+  $(document).on('mouseenter', '.js-nav-flyout-nested', function () {
+    if (!isDesktopNav()) return;
+    $(this).addClass('is-open').siblings('.js-nav-flyout-nested').removeClass('is-open');
+  });
+
+  $(document).on('mouseleave', '.js-nav-flyout-nested', function () {
+    if (!isDesktopNav()) return;
+    $(this).removeClass('is-open');
+  });
+
+  $(document).on('click', function (e) {
+    if ($(e.target).closest('.js-nav-dropdown').length) return;
+    $('.js-nav-dropdown.is-open').each(function () {
+      closeNavDropdown($(this));
+    });
+  });
+
+  /* ------------------------------------------------------------------ */
   /* Live search suggestions                                            */
   /* ------------------------------------------------------------------ */
 

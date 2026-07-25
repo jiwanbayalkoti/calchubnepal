@@ -50,7 +50,7 @@
 
 <header class="site-header">
     <nav class="navbar navbar-expand-lg py-2">
-        <div class="container d-flex align-items-center gap-3">
+        <div class="container align-items-center">
             <a class="brand-logo" href="{{ route('home') }}">
                 <span class="brand-mark"><i class="bi bi-calculator"></i></span>
                 <span>{{ $hub->siteName() }}</span>
@@ -61,62 +61,210 @@
             </button>
 
             <div class="collapse navbar-collapse" id="mainNavbar">
-                <ul class="navbar-nav main-nav mx-lg-3 gap-1">
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('nav.home') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('calculators.*') ? 'active' : '' }}" href="{{ route('calculators.index') }}">{{ __('nav.calculators') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">{{ __('nav.categories') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('blog.*') ? 'active' : '' }}" href="{{ route('blog.index') }}">{{ __('nav.blog') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('qr-code-generator*') ? 'active' : '' }}" href="{{ route('qr-code-generator') }}">{{ __('nav.qr') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('visiting-card-designer*') ? 'active' : '' }}" href="{{ route('visiting-card-designer') }}">{{ __('nav.visiting_card') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">{{ __('nav.about') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('pricing') ? 'active' : '' }}" href="{{ route('pricing') }}">{{ __('nav.pricing') }}</a></li>
-                    <li class="nav-item"><a class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">{{ __('nav.contact') }}</a></li>
+                <ul class="navbar-nav main-nav ms-lg-4 me-lg-auto gap-lg-1">
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('nav.home') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('calculators.*') ? 'active' : '' }}" href="{{ route('calculators.index') }}">{{ __('nav.calculators') }}</a>
+                    </li>
+                    <li class="nav-item dropdown js-nav-dropdown">
+                        @php
+                            $toolsActive = request()->routeIs('qr-code-generator*', 'visiting-card-designer*', 'categories.*');
+                            $navQrTypes = \App\Enums\Qr\QrType::cases();
+                            $navCardStyles = [
+                                'Professional' => 'bi-briefcase',
+                                'Minimal' => 'bi-square',
+                                'Bold' => 'bi-type-bold',
+                                'Premium' => 'bi-gem',
+                                'Creative' => 'bi-brush',
+                                'Corporate' => 'bi-buildings',
+                            ];
+                            $navCardsByStyle = [];
+                            foreach (\App\Enums\VisitingCard\CardTemplate::cases() as $cardTemplate) {
+                                $navCardsByStyle[$cardTemplate->category()][] = $cardTemplate;
+                            }
+                            $navCategories = \Illuminate\Support\Facades\Cache::remember('calc_hub:nav:categories:icons', 3600, function () {
+                                return \App\Models\CalculatorCategory::query()
+                                    ->active()
+                                    ->ordered()
+                                    ->get(['name', 'slug', 'icon'])
+                                    ->map(fn ($category) => [
+                                        'name' => $category->name,
+                                        'slug' => $category->slug,
+                                        'icon' => $category->icon ?: 'bi-grid',
+                                    ])
+                                    ->all();
+                            });
+                        @endphp
+                        <a class="nav-link dropdown-toggle {{ $toolsActive ? 'active' : '' }}" href="#" id="navToolsDropdown" role="button" aria-expanded="false" aria-haspopup="true">
+                            {{ __('nav.tools') }}
+                        </a>
+                        <ul class="dropdown-menu nav-dropdown" aria-labelledby="navToolsDropdown">
+                            <li class="nav-flyout js-nav-flyout">
+                                <a class="dropdown-item has-flyout {{ request()->routeIs('qr-code-generator*') ? 'active' : '' }}" href="{{ route('qr-code-generator') }}">
+                                    <i class="bi bi-qr-code"></i>
+                                    <span>
+                                        <strong>{{ __('nav.qr') }}</strong>
+                                        <small>{{ __('nav.qr_hint') }}</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right flyout-caret"></i>
+                                </a>
+                                <div class="nav-flyout-menu" aria-label="{{ __('nav.qr') }}">
+                                    <div class="nav-flyout-grid">
+                                        @foreach ($navQrTypes as $qrType)
+                                            <a class="nav-flyout-tile" href="{{ route('qr-code-generator', ['type' => $qrType->value]) }}">
+                                                <i class="bi {{ $qrType->icon() }}"></i>
+                                                <span>{{ $qrType->label() }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                    <a class="nav-flyout-footer" href="{{ route('qr-code-generator') }}">
+                                        {{ __('nav.view_all_qr') }} <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            <li class="nav-flyout js-nav-flyout">
+                                <a class="dropdown-item has-flyout {{ request()->routeIs('visiting-card-designer*') ? 'active' : '' }}" href="{{ route('visiting-card-designer') }}">
+                                    <i class="bi bi-person-vcard"></i>
+                                    <span>
+                                        <strong>{{ __('nav.visiting_card') }}</strong>
+                                        <small>{{ __('nav.visiting_card_hint') }}</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right flyout-caret"></i>
+                                </a>
+                                <div class="nav-flyout-menu nav-flyout-menu--stack" aria-label="{{ __('nav.visiting_card') }}">
+                                    <div class="nav-flyout-stack">
+                                        @foreach ($navCardStyles as $style => $styleIcon)
+                                            <div class="nav-flyout-nested js-nav-flyout-nested">
+                                                <a class="nav-flyout-tile has-nested" href="{{ route('visiting-card-designer', ['style' => $style]) }}">
+                                                    <i class="bi {{ $styleIcon }}"></i>
+                                                    <span>{{ __('vc.filter_' . strtolower($style)) }}</span>
+                                                    <i class="bi bi-chevron-right nested-caret"></i>
+                                                </a>
+                                                <div class="nav-flyout-submenu">
+                                                    <div class="nav-flyout-grid nav-flyout-grid--templates">
+                                                        @foreach ($navCardsByStyle[$style] ?? [] as $cardTemplate)
+                                                            <a class="nav-flyout-tile" href="{{ route('visiting-card-designer', ['template' => $cardTemplate->value]) }}">
+                                                                <i class="bi bi-person-vcard"></i>
+                                                                <span>{{ $cardTemplate->label() }}</span>
+                                                            </a>
+                                                        @endforeach
+                                                    </div>
+                                                    <a class="nav-flyout-footer" href="{{ route('visiting-card-designer', ['style' => $style]) }}">
+                                                        {{ __('nav.view_style_cards') }} <i class="bi bi-arrow-right"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <a class="nav-flyout-footer" href="{{ route('visiting-card-designer') }}">
+                                        {{ __('nav.view_all_cards') }} <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="nav-flyout js-nav-flyout">
+                                <a class="dropdown-item has-flyout {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
+                                    <i class="bi bi-grid-3x3-gap"></i>
+                                    <span>
+                                        <strong>{{ __('nav.categories') }}</strong>
+                                        <small>{{ __('nav.categories_hint') }}</small>
+                                    </span>
+                                    <i class="bi bi-chevron-right flyout-caret"></i>
+                                </a>
+                                <div class="nav-flyout-menu" aria-label="{{ __('nav.categories') }}">
+                                    <div class="nav-flyout-grid">
+                                        @foreach ($navCategories as $navCategory)
+                                            <a class="nav-flyout-tile {{ request()->is('category/'.$navCategory['slug']) ? 'active' : '' }}" href="{{ route('categories.show', $navCategory['slug']) }}">
+                                                <i class="bi {{ $navCategory['icon'] }}"></i>
+                                                <span>{{ $navCategory['name'] }}</span>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                    <a class="nav-flyout-footer" href="{{ route('categories.index') }}">
+                                        {{ __('nav.view_all_categories') }} <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('blog.*') ? 'active' : '' }}" href="{{ route('blog.index') }}">{{ __('nav.blog') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('pricing') ? 'active' : '' }}" href="{{ route('pricing') }}">{{ __('nav.pricing') }}</a>
+                    </li>
+                    <li class="nav-item dropdown js-nav-dropdown">
+                        @php
+                            $companyActive = request()->routeIs('about', 'contact');
+                        @endphp
+                        <a class="nav-link dropdown-toggle {{ $companyActive ? 'active' : '' }}" href="#" id="navCompanyDropdown" role="button" aria-expanded="false" aria-haspopup="true">
+                            {{ __('nav.company') }}
+                        </a>
+                        <ul class="dropdown-menu nav-dropdown" aria-labelledby="navCompanyDropdown">
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">
+                                    <i class="bi bi-info-circle"></i>
+                                    <span><strong>{{ __('nav.about') }}</strong></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">
+                                    <i class="bi bi-envelope"></i>
+                                    <span><strong>{{ __('nav.contact') }}</strong></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
 
-                <form class="search-box mx-lg-2 my-2 my-lg-0 flex-grow-1" style="max-width: 320px;" action="{{ route('search.results') }}" method="GET" role="search">
-                    <i class="bi bi-search"></i>
-                    <input type="search" name="q" value="{{ request('q') }}" class="form-control js-live-search" placeholder="{{ __('nav.search_placeholder') }}" autocomplete="off">
-                </form>
+                <div class="header-actions d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 ms-lg-3 mt-3 mt-lg-0">
+                    <form class="search-box header-search" action="{{ route('search.results') }}" method="GET" role="search">
+                        <i class="bi bi-search"></i>
+                        <input type="search" name="q" value="{{ request('q') }}" class="form-control js-live-search" placeholder="{{ __('nav.search_placeholder') }}" autocomplete="off">
+                    </form>
 
-                <div class="d-flex align-items-center gap-2 ms-lg-2 mt-2 mt-lg-0">
-                    <div class="lang-switch btn-group" role="group" aria-label="{{ __('nav.language') }}">
-                        <a href="{{ route('locale.switch', 'en') }}" class="btn btn-sm {{ app()->getLocale() === 'en' ? 'btn-brand' : 'btn-outline-brand' }}" hreflang="en">EN</a>
-                        <a href="{{ route('locale.switch', 'ne') }}" class="btn btn-sm {{ app()->getLocale() === 'ne' ? 'btn-brand' : 'btn-outline-brand' }}" hreflang="ne">NE</a>
-                    </div>
-
-                    <button type="button" class="theme-toggle" aria-label="{{ __('nav.theme') }}">
-                        <i class="bi bi-moon-stars"></i>
-                    </button>
-
-                    @auth
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-soft dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i>
-                                <span class="d-none d-lg-inline">{{ \Illuminate\Support\Str::limit(auth()->user()->name, 14) }}</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end account-dropdown">
-                                <li><a class="dropdown-item" href="{{ route('account.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>{{ __('nav.dashboard') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ route('account.saved.index') }}"><i class="bi bi-bookmark-star me-2"></i>{{ __('nav.saved') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ route('account.favorites.index') }}"><i class="bi bi-heart me-2"></i>{{ __('nav.favorites') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ route('account.subscription') }}"><i class="bi bi-credit-card me-2"></i>{{ __('nav.subscription') }}</a></li>
-                                <li><a class="dropdown-item" href="{{ route('account.profile.edit') }}"><i class="bi bi-person-gear me-2"></i>{{ __('nav.profile') }}</a></li>
-                                @if (auth()->user()->canAccessAdmin())
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-shield-lock me-2"></i>{{ __('nav.admin') }}</a></li>
-                                @endif
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>{{ __('nav.logout') }}</button>
-                                    </form>
-                                </li>
-                            </ul>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="lang-switch btn-group" role="group" aria-label="{{ __('nav.language') }}">
+                            <a href="{{ route('locale.switch', 'en') }}" class="btn btn-sm {{ app()->getLocale() === 'en' ? 'btn-brand' : 'btn-outline-brand' }}" hreflang="en">EN</a>
+                            <a href="{{ route('locale.switch', 'ne') }}" class="btn btn-sm {{ app()->getLocale() === 'ne' ? 'btn-brand' : 'btn-outline-brand' }}" hreflang="ne">NE</a>
                         </div>
-                    @else
-                        <button type="button" class="btn btn-sm btn-outline-brand d-none d-lg-inline-block js-open-auth" data-auth="login">{{ __('nav.login') }}</button>
-                        <button type="button" class="btn btn-sm btn-brand js-open-auth" data-auth="register">{{ __('nav.signup') }}</button>
-                    @endauth
+
+                        <button type="button" class="theme-toggle" aria-label="{{ __('nav.theme') }}">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+
+                        @auth
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-soft dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span class="d-none d-xl-inline">{{ \Illuminate\Support\Str::limit(auth()->user()->name, 14) }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end account-dropdown">
+                                    <li><a class="dropdown-item" href="{{ route('account.dashboard') }}"><i class="bi bi-speedometer2 me-2"></i>{{ __('nav.dashboard') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('account.saved.index') }}"><i class="bi bi-bookmark-star me-2"></i>{{ __('nav.saved') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('account.favorites.index') }}"><i class="bi bi-heart me-2"></i>{{ __('nav.favorites') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('account.subscription') }}"><i class="bi bi-credit-card me-2"></i>{{ __('nav.subscription') }}</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('account.profile.edit') }}"><i class="bi bi-person-gear me-2"></i>{{ __('nav.profile') }}</a></li>
+                                    @if (auth()->user()->canAccessAdmin())
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-shield-lock me-2"></i>{{ __('nav.admin') }}</a></li>
+                                    @endif
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="POST" action="{{ route('logout') }}">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>{{ __('nav.logout') }}</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        @else
+                            <button type="button" class="btn btn-sm btn-outline-brand d-none d-lg-inline-block js-open-auth" data-auth="login">{{ __('nav.login') }}</button>
+                            <button type="button" class="btn btn-sm btn-brand js-open-auth" data-auth="register">{{ __('nav.signup') }}</button>
+                        @endauth
+                    </div>
                 </div>
             </div>
         </div>
