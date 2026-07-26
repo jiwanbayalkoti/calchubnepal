@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\Admin\UserRegistered;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Admin\AdminNotifier;
+use App\Services\BreathHold\BreathHoldService;
 use GuzzleHttp\Client;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ class GoogleAuthController extends Controller
     public function __construct(
         protected ActivityLogService $activityLog,
         protected AdminNotifier $notifier,
+        protected BreathHoldService $breathHold,
     ) {
     }
 
@@ -128,9 +130,13 @@ class GoogleAuthController extends Controller
             'email' => $user->email,
         ]);
 
-        $default = $user->homePath();
+        $claimed = $this->breathHold->claimPendingFromSession(request(), $user);
 
-        return redirect()->intended($default);
+        if ($claimed) {
+            return redirect()->route('home', ['open_breath_cert' => $claimed->id]).'#breath-hold';
+        }
+
+        return redirect()->intended($user->homePath());
     }
 
     protected function google(): Provider

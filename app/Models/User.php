@@ -150,6 +150,11 @@ class User extends Authenticatable
         return $this->hasMany(CalculationHistory::class);
     }
 
+    public function breathHoldResults(): HasMany
+    {
+        return $this->hasMany(BreathHoldResult::class);
+    }
+
     public function qrCodes(): HasMany
     {
         return $this->hasMany(QrCode::class);

@@ -258,6 +258,12 @@
                             <p>Analytics</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.breath-hold.index') }}" class="nav-link {{ str($current)->startsWith('admin.breath-hold') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-stopwatch"></i>
+                            <p>Breath Hold Game</p>
+                        </a>
+                    </li>
 
                     <li class="nav-header">SYSTEM</li>
                     <li class="nav-item">

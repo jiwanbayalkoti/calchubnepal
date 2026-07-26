@@ -10,17 +10,22 @@
         <div class="atmosphere-shape" style="width:340px;height:340px;background:var(--accent);top:40px;right:-100px;"></div>
 
         <div class="container position-relative" style="z-index:2;">
-            <div class="row align-items-center g-4 g-xl-5">
-                <div class="col-lg-5 col-xl-6 text-center text-lg-start hero-copy">
+            <div class="row align-items-stretch g-3 g-xl-4">
+                <div class="col-lg-3 col-xl-3 text-center text-lg-start hero-copy d-flex flex-column justify-content-center">
                     <span class="hero-eyebrow"><i class="bi bi-stars"></i> {{ __('home.eyebrow') }}</span>
                     <h1 class="hero-title">{{ __('home.hero_title') }}</h1>
                     <p class="hero-subtitle hero-subtitle--left">{{ __('home.hero_subtitle') }}</p>
-                    <a href="{{ route('calculators.index') }}" class="btn btn-brand btn-lg">
-                        {{ __('home.cta_explore') }} <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
+                    <div>
+                        <a href="{{ route('calculators.index') }}" class="btn btn-brand btn-lg">
+                            {{ __('home.cta_explore') }} <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-lg-7 col-xl-6">
+                <div class="col-md-6 col-lg-5 col-xl-5">
                     @include('partials.home.quick-try')
+                </div>
+                <div class="col-md-6 col-lg-4 col-xl-4" id="breath-hold">
+                    @include('partials.home.breath-hold-card')
                 </div>
             </div>
         </div>

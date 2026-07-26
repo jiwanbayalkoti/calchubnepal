@@ -34,7 +34,7 @@
 @endphp
 
 <div
-    class="quick-try"
+    class="quick-try h-100"
     x-data="quickTryWidget(@js($quickTryTabs))"
 >
     <div class="quick-try__header">

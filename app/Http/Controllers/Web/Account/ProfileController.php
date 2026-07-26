@@ -29,6 +29,11 @@ class ProfileController extends Controller
         return view('account.profile', [
             'user' => $request->user(),
             'meta' => $meta,
+            'breathHoldResults' => $request->user()
+                ->breathHoldResults()
+                ->latest()
+                ->limit(5)
+                ->get(),
         ]);
     }
 

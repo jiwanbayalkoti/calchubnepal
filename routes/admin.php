@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AiPromptController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ApiKeyController;
 use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\BreathHoldResultController;
 use App\Http\Controllers\Admin\CalculatorController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactMessageController;
@@ -121,6 +122,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('analytics/page-views-chart', [AnalyticsController::class, 'pageViewsChart'])->name('analytics.page-views-chart');
+
+    Route::get('breath-hold', [BreathHoldResultController::class, 'index'])->name('breath-hold.index');
+    Route::get('breath-hold/data', [BreathHoldResultController::class, 'data'])->name('breath-hold.data');
 
     Route::get('seo-pages/data', [SeoPageController::class, 'data'])->name('seo-pages.data');
     Route::resource('seo-pages', SeoPageController::class)

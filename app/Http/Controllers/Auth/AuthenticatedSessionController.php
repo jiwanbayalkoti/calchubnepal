@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\BreathHold\BreathHoldService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,10 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    public function __construct(protected BreathHoldService $breathHold)
+    {
+    }
+
     /**
      * Display the login view (full page fallback / redirect to modal on home).
      */
@@ -44,14 +49,21 @@ class AuthenticatedSessionController extends Controller
             }
         }
 
-        $default = $user?->homePath() ?? route('account.dashboard', absolute: false);
+        $claimed = $user ? $this->breathHold->claimPendingFromSession($request, $user) : null;
 
-        $redirectTo = $request->session()->pull('url.intended', $default);
+        $default = $user?->homePath() ?? route('account.dashboard', absolute: false);
+        $redirectTo = $claimed
+            ? route('home', absolute: false).'#breath-hold'
+            : $request->session()->pull('url.intended', $default);
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Logged in successfully.',
+                'message' => $claimed
+                    ? 'Logged in. Your breath-hold certificate is ready.'
+                    : 'Logged in successfully.',
                 'redirect' => $redirectTo,
+                'certificate_claimed' => (bool) $claimed,
+                'certificate_url' => $claimed ? route('breath-hold.certificate', $claimed) : null,
             ]);
         }
 

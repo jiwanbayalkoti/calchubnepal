@@ -25,6 +25,9 @@
         <a class="nav-link {{ request()->routeIs('account.history.*') ? 'active' : '' }}" href="{{ route('account.history.index') }}">
             <i class="bi bi-clock-history"></i> History
         </a>
+        <a class="nav-link {{ request()->routeIs('account.breath-hold.*') ? 'active' : '' }}" href="{{ route('account.breath-hold.index') }}">
+            <i class="bi bi-lungs"></i> Breath Hold
+        </a>
         <a class="nav-link {{ request()->routeIs('account.saved.*') ? 'active' : '' }}" href="{{ route('account.saved.index') }}">
             <i class="bi bi-bookmark-star"></i> Saved
         </a>

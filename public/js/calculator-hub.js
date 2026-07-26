@@ -1053,6 +1053,45 @@
           if (window.toastr) {
             toastr.success(response.message || 'Success');
           }
+
+          const openCert = function (url) {
+            if (url) {
+              try {
+                sessionStorage.setItem('breath_hold_open_cert', url);
+              } catch (e) { /* ignore */ }
+            }
+          };
+
+          const token = localStorage.getItem('breath_hold_claim_token');
+          if (token && !response.certificate_claimed) {
+            $.ajax({
+              url: '/breath-hold/claim',
+              method: 'POST',
+              data: JSON.stringify({ claim_token: token }),
+              contentType: 'application/json',
+              dataType: 'json',
+              headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+              },
+            })
+              .done(function (claim) {
+                localStorage.removeItem('breath_hold_claim_token');
+                openCert(claim.certificate_url || claim.redirect);
+                window.location.href = response.redirect || '/#breath-hold';
+              })
+              .fail(function () {
+                window.location.href = response.redirect || '/account';
+              });
+            return;
+          }
+
+          if (response.certificate_claimed) {
+            localStorage.removeItem('breath_hold_claim_token');
+            openCert(response.certificate_url || response.redirect);
+          }
+
           window.location.href = response.redirect || '/account';
         })
         .fail(function (xhr) {
@@ -1162,5 +1201,151 @@
       setCookieConsent('0');
       $banner.addClass('d-none');
     });
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* Breath Hold certificate modal (AJAX preview, no page refresh)     */
+  /* ------------------------------------------------------------------ */
+
+  let breathCertModalInstance = null;
+
+  function getBreathCertModal() {
+    const el = document.getElementById('breathHoldCertModal');
+    if (!el || !window.bootstrap) {
+      return null;
+    }
+    if (!breathCertModalInstance) {
+      breathCertModalInstance = bootstrap.Modal.getOrCreateInstance(el);
+    }
+    return breathCertModalInstance;
+  }
+
+  function fillBreathCertModal(data) {
+    const title = data.funny_title || 'Breath Hold certificate';
+    const code = data.certificate_code || '';
+    $('#breathHoldCertModalTitle').text(title);
+    $('#breathHoldCertModalMeta').text(
+      [data.duration, data.band_label, code].filter(Boolean).join(' · ')
+    );
+    $('#breathHoldCertDownload').attr('href', data.download_url || '#');
+    $('#breathHoldCertDetails').html([
+      detailCol('Hold time', data.duration),
+      detailCol('Band', data.band_label + (data.band_range ? ' (' + data.band_range + ')' : '')),
+      detailCol('Certificate ID', code ? '<code>' + $('<div>').text(code).html() + '</code>' : '—'),
+      detailCol('Played', data.played_at || '—'),
+    ].join(''));
+    if (data.funny_subtitle) {
+      $('#breathHoldCertDetails').append(
+        '<div class="col-12 text-muted mt-1">' + $('<div>').text(data.funny_subtitle).html() + '</div>'
+      );
+    }
+
+    const $img = $('#breathHoldCertImage');
+    $img.addClass('d-none').attr('src', '');
+    $('#breathHoldCertBody').removeClass('d-none');
+    $('#breathHoldCertLoading').removeClass('d-none');
+
+    const img = new Image();
+    img.onload = function () {
+      $img.attr('src', data.image_url).attr('alt', 'Certificate ' + code).removeClass('d-none');
+      $('#breathHoldCertLoading').addClass('d-none');
+    };
+    img.onerror = function () {
+      $('#breathHoldCertLoading').addClass('d-none');
+      $('#breathHoldCertError').removeClass('d-none').text('Could not load certificate image.');
+    };
+    img.src = data.image_url + (data.image_url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+  }
+
+  function detailCol(label, valueHtml) {
+    return (
+      '<div class="col-sm-6 col-md-3">' +
+        '<div class="text-muted">' + label + '</div>' +
+        '<div class="fw-semibold">' + (valueHtml || '—') + '</div>' +
+      '</div>'
+    );
+  }
+
+  window.openBreathHoldCertificate = function (certUrlOrData) {
+    const modal = getBreathCertModal();
+    if (!modal) {
+      if (typeof certUrlOrData === 'string') {
+        window.location.href = certUrlOrData;
+      } else if (certUrlOrData && certUrlOrData.view_url) {
+        window.location.href = certUrlOrData.view_url;
+      }
+      return;
+    }
+
+    $('#breathHoldCertError').addClass('d-none').empty();
+    $('#breathHoldCertBody').addClass('d-none');
+    $('#breathHoldCertLoading').removeClass('d-none');
+    modal.show();
+
+    if (certUrlOrData && typeof certUrlOrData === 'object' && certUrlOrData.image_url) {
+      fillBreathCertModal(certUrlOrData);
+      return;
+    }
+
+    const url = typeof certUrlOrData === 'string' ? certUrlOrData : null;
+    if (!url) {
+      $('#breathHoldCertLoading').addClass('d-none');
+      $('#breathHoldCertError').removeClass('d-none').text('Certificate not found.');
+      return;
+    }
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      dataType: 'json',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    })
+      .done(function (data) {
+        fillBreathCertModal(data);
+      })
+      .fail(function (xhr) {
+        $('#breathHoldCertLoading').addClass('d-none');
+        const msg = (xhr.responseJSON && xhr.responseJSON.message)
+          || 'Unable to load certificate. Please try again.';
+        $('#breathHoldCertError').removeClass('d-none').text(msg);
+      });
+  };
+
+  $(document).on('click', '.js-breath-cert-view', function (e) {
+    e.preventDefault();
+    const url = $(this).data('cert-url') || $(this).attr('href');
+    if (url) {
+      window.openBreathHoldCertificate(url);
+    }
+  });
+
+  $(function () {
+    let pendingCert = null;
+    try {
+      pendingCert = sessionStorage.getItem('breath_hold_open_cert');
+      if (pendingCert) {
+        sessionStorage.removeItem('breath_hold_open_cert');
+      }
+    } catch (e) { /* ignore */ }
+
+    const params = new URLSearchParams(window.location.search);
+    const openId = params.get('open_breath_cert');
+    if (openId) {
+      pendingCert = '/breath-hold/certificate/' + encodeURIComponent(openId);
+      params.delete('open_breath_cert');
+      if (window.history && window.history.replaceState) {
+        const next = window.location.pathname + (params.toString() ? '?' + params.toString() : '') + window.location.hash;
+        window.history.replaceState({}, '', next);
+      }
+    }
+
+    if (pendingCert && typeof window.openBreathHoldCertificate === 'function') {
+      setTimeout(function () {
+        window.openBreathHoldCertificate(pendingCert);
+      }, 400);
+    }
   });
 })(window.jQuery);

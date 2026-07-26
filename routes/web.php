@@ -9,12 +9,14 @@ use App\Http\Controllers\Web\Account\SavedCalculationController as AccountSavedC
 use App\Http\Controllers\Web\Account\SubscriptionController as AccountSubscriptionController;
 use App\Http\Controllers\Web\Account\ApiKeyController as AccountApiKeyController;
 use App\Http\Controllers\Web\Account\BrandTemplateController as AccountBrandTemplateController;
+use App\Http\Controllers\Web\Account\BreathHoldController as AccountBreathHoldController;
 use App\Http\Controllers\Web\Account\BulkQrController as AccountBulkQrController;
 use App\Http\Controllers\Web\Account\CampaignController as AccountCampaignController;
 use App\Http\Controllers\Web\Account\QrEnterpriseDashboardController as AccountQrEnterpriseDashboardController;
 use App\Http\Controllers\Web\Account\WorkspaceController as AccountWorkspaceController;
 use App\Http\Controllers\Web\AdTrackingController;
 use App\Http\Controllers\Web\BlogController;
+use App\Http\Controllers\Web\BreathHoldController;
 use App\Http\Controllers\Web\CalculatorController;
 use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\FeedbackController;
@@ -122,6 +124,18 @@ Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
+Route::middleware('throttle:30,1')->prefix('breath-hold')->name('breath-hold.')->group(function () {
+    Route::post('/results', [BreathHoldController::class, 'store'])->name('store');
+    Route::post('/claim', [BreathHoldController::class, 'claim'])
+        ->middleware('auth')
+        ->name('claim');
+    Route::middleware('auth')->group(function () {
+        Route::get('/certificate/{result}', [BreathHoldController::class, 'show'])->name('certificate');
+        Route::get('/certificate/{result}/image', [BreathHoldController::class, 'image'])->name('certificate.image');
+        Route::get('/certificate/{result}/download', [BreathHoldController::class, 'download'])->name('certificate.download');
+    });
+});
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated User Account
@@ -141,6 +155,14 @@ Route::middleware(['auth', 'verified'])->prefix('account')->name('account.')->gr
     Route::get('/history', [AccountHistoryController::class, 'index'])->name('history.index');
     Route::delete('/history/{history}', [AccountHistoryController::class, 'destroy'])->name('history.destroy');
     Route::delete('/history', [AccountHistoryController::class, 'clear'])->name('history.clear');
+
+    Route::get('/breath-hold', [AccountBreathHoldController::class, 'index'])->name('breath-hold.index');
+    Route::get('/breath-hold/{result}', [AccountBreathHoldController::class, 'show'])->name('breath-hold.show');
+    Route::get('/breath-hold/{result}/image', [AccountBreathHoldController::class, 'image'])->name('breath-hold.image');
+    Route::get('/breath-hold/{result}/download', [AccountBreathHoldController::class, 'download'])->name('breath-hold.download');
+    Route::get('/breath-hold/{result}/certificate', function (\App\Models\BreathHoldResult $result) {
+        return redirect()->route('account.breath-hold.show', $result);
+    })->name('breath-hold.certificate');
 
     Route::get('/favorites', [AccountFavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/{calculator}/toggle', [AccountFavoriteController::class, 'toggle'])->name('favorites.toggle');

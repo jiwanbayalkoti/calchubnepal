@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\Admin\UserRegistered;
 use App\Services\Admin\AdminNotifier;
+use App\Services\BreathHold\BreathHoldService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -18,8 +19,10 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    public function __construct(protected AdminNotifier $notifier)
-    {
+    public function __construct(
+        protected AdminNotifier $notifier,
+        protected BreathHoldService $breathHold,
+    ) {
     }
 
     /**
@@ -58,12 +61,19 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        $redirectTo = route('account.dashboard', absolute: false);
+        $claimed = $this->breathHold->claimPendingFromSession($request, $user);
+        $redirectTo = $claimed
+            ? route('home', absolute: false).'#breath-hold'
+            : route('account.dashboard', absolute: false);
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
-                'message' => 'Account created successfully.',
+                'message' => $claimed
+                    ? 'Account created. Your breath-hold certificate is ready.'
+                    : 'Account created successfully.',
                 'redirect' => $redirectTo,
+                'certificate_claimed' => (bool) $claimed,
+                'certificate_url' => $claimed ? route('breath-hold.certificate', $claimed) : null,
             ]);
         }
 

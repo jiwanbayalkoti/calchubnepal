@@ -65,6 +65,51 @@
         </form>
     </div>
 
+    <div class="card-surface p-3 p-md-4 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h2 class="h5 mb-0">Breath Hold results</h2>
+            <a href="{{ route('account.breath-hold.index') }}" class="btn btn-sm btn-outline-brand">View all</a>
+        </div>
+        @forelse ($breathHoldResults as $item)
+            <div class="d-flex align-items-center justify-content-between gap-2 py-2 {{ ! $loop->last ? 'border-bottom' : '' }}">
+                <div>
+                    <div class="fw-semibold">
+                        {{ $item->formattedDuration() }}
+                        <span class="badge ms-1
+                            @if($item->band === 'poor') text-bg-danger
+                            @elseif($item->band === 'medium') text-bg-warning
+                            @else text-bg-success
+                            @endif">{{ $item->bandLabel() }}</span>
+                    </div>
+                    <div class="small text-muted-custom">
+                        {{ $item->created_at?->diffForHumans() }}
+                        @if ($item->certificate_code)
+                            · <code>{{ $item->certificate_code }}</code>
+                        @endif
+                    </div>
+                </div>
+                @if ($item->hasCertificate())
+                    <div class="d-flex gap-1">
+                        <a href="{{ route('account.breath-hold.show', $item) }}"
+                           class="btn btn-sm btn-soft js-breath-cert-view"
+                           data-cert-url="{{ route('account.breath-hold.show', $item) }}"
+                           title="View">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ route('account.breath-hold.download', $item) }}" class="btn btn-sm btn-soft" title="Download">
+                            <i class="bi bi-download"></i>
+                        </a>
+                    </div>
+                @endif
+            </div>
+        @empty
+            <p class="text-muted-custom mb-0 small">
+                No results yet.
+                <a href="{{ route('home') }}#breath-hold">Take the Breath Hold Test</a>.
+            </p>
+        @endforelse
+    </div>
+
     <div class="card-surface p-3 p-md-4 border border-danger-subtle">
         <h2 class="h5 text-danger mb-2">Delete account</h2>
         <p class="text-muted-custom small mb-3">This permanently removes your account, history, favorites and saved calculations.</p>
