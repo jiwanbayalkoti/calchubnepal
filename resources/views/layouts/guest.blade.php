@@ -23,7 +23,7 @@
     @include('partials.critical-css')
 
     @php
-        $fontCss = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=optional';
+        $fontCss = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap';
         $bootstrapCss = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css';
         $iconsCss = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
         $appCssFile = is_file(public_path('css/calculator-hub.min.css'))
@@ -37,9 +37,9 @@
     @endphp
 
     @include('partials.async-css', ['href' => $fontCss])
-    @include('partials.async-css', ['href' => $bootstrapCss])
+    <link rel="stylesheet" href="{{ $bootstrapCss }}">
     @include('partials.async-css', ['href' => $iconsCss])
-    @include('partials.async-css', ['href' => $appCss])
+    <link rel="stylesheet" href="{{ $appCss }}">
 
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
