@@ -25,7 +25,7 @@ class SeoService
             'title' => $this->hub->defaultMetaTitle(),
             'description' => $this->hub->defaultMetaDescription(),
             'keywords' => null,
-            'canonical' => url()->current(),
+            'canonical' => $this->normalizeCanonical(url()->current()),
             'og_image' => null,
             'robots' => 'index,follow',
         ];
@@ -34,12 +34,55 @@ class SeoService
             'title' => $page->meta_title ?: $page->title,
             'description' => $page->meta_description,
             'keywords' => $page->meta_keywords,
-            'canonical' => $page->canonical_url ?: url()->current(),
+            'canonical' => $page->canonical_url ?: $this->normalizeCanonical(url()->current()),
             'og_image' => $page->og_image,
             'robots' => $page->robots ?: 'index,follow',
         ], static fn ($value) => $value !== null) : [];
 
-        return array_merge($defaults, $fromPage, $overrides);
+        $meta = array_merge($defaults, $fromPage, $overrides);
+
+        if (! empty($meta['canonical'])) {
+            $meta['canonical'] = $this->normalizeCanonical((string) $meta['canonical']);
+        }
+
+        if (! empty($meta['og_image'])) {
+            $meta['og_image'] = $this->normalizeCanonical((string) $meta['og_image'], keepPathAsIs: true);
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Rewrite any absolute/relative URL onto APP_URL host + https.
+     * Strips query strings and fragments so ?template= / ?utm= do not create duplicates.
+     */
+    public function normalizeCanonical(string $url, bool $keepPathAsIs = false): string
+    {
+        $root = rtrim((string) config('app.url'), '/');
+        $rootParts = parse_url($root) ?: [];
+
+        if ($url === '' || $url === '/') {
+            return $root.'/';
+        }
+
+        // Relative path
+        if (str_starts_with($url, '/')) {
+            return $root.$url;
+        }
+
+        $parts = parse_url($url) ?: [];
+        $path = $parts['path'] ?? '/';
+
+        if ($keepPathAsIs && isset($parts['host']) && isset($rootParts['host'])
+            && strcasecmp((string) $parts['host'], (string) $rootParts['host']) === 0) {
+            return $url;
+        }
+
+        // Asset URLs (storage/images) — keep full path under preferred host
+        $scheme = $rootParts['scheme'] ?? 'https';
+        $host = $rootParts['host'] ?? ($parts['host'] ?? 'localhost');
+
+        return $scheme.'://'.$host.$path;
     }
 
     /**

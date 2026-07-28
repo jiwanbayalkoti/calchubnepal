@@ -3,8 +3,14 @@
     $metaTitle = $meta['title'] ?? config('app.name');
     $metaDescription = $meta['description'] ?? 'Free, accurate, AI-powered calculators for finance, health, construction, math and everyday life.';
     $metaKeywords = $meta['keywords'] ?? null;
-    $metaCanonical = $meta['canonical'] ?? url()->current();
-    $metaImage = $meta['og_image'] ?? asset('images/og-default.webp');
+    $seo = app(\App\Services\Seo\SeoService::class);
+    $metaCanonical = $seo->normalizeCanonical((string) ($meta['canonical'] ?? url()->current()));
+    $rawImage = (string) ($meta['og_image'] ?? asset('images/og-default.webp'));
+    $metaImage = preg_replace(
+        '#^https?://[^/]+#i',
+        rtrim((string) config('app.url'), '/'),
+        $rawImage
+    ) ?: $seo->normalizeCanonical($rawImage);
     $metaRobots = $meta['robots'] ?? 'index,follow';
 @endphp
 

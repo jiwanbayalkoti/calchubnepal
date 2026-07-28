@@ -23,15 +23,17 @@ class SitemapController extends Controller
     public function robots(): Response
     {
         $sitemapUrl = rtrim((string) config('app.url'), '/').'/sitemap.xml';
+
         $body = implode("\n", [
             'User-agent: *',
             'Allow: /',
-            '',
-            'Disallow: /admin',
-            'Disallow: /account',
-            'Disallow: /advertiser',
+            'Disallow: /admin/',
+            'Disallow: /account/',
+            'Disallow: /advertiser/',
             'Disallow: /login',
             'Disallow: /register',
+            'Disallow: /forgot-password',
+            'Disallow: /reset-password',
             'Disallow: /dashboard',
             'Disallow: /profile',
             'Disallow: /api/',
@@ -40,6 +42,9 @@ class SitemapController extends Controller
             '',
         ]);
 
-        return response($body, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+        return response($body, 200, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
     }
 }
