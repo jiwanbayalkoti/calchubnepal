@@ -11,7 +11,7 @@
   --accent: #F4A259;
   --accent-rgb: 244, 162, 89;
   --ink: #1A1A1A;
-  --muted: #5C6B73;
+  --muted: #4A5A62;
   --surface: #F7F9F8;
   --card: #FFFFFF;
   --border: rgba(26, 26, 26, 0.08);
@@ -35,7 +35,7 @@ html[data-theme='dark'] {
   --brand-dark: #0B6E4F;
   --accent: #F4A259;
   --ink: #EDF3F0;
-  --muted: #A2B3AC;
+  --muted: #B7C4BE;
   --surface: #0E1512;
   --card: #16201C;
   --border: rgba(237, 243, 240, 0.09);
@@ -683,12 +683,14 @@ html[data-theme='dark'] .main-nav .nav-link.show {
 .lang-switch .btn {
   border-radius: 999px;
   font-size: 0.82rem;
-  padding: 0.3rem 0.7rem;
+  padding: 0.45rem 0.85rem;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .theme-toggle {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -1565,8 +1567,6 @@ html[data-theme='dark'] .how-to-card__link:hover {
 
 .section {
   padding: 4.5rem 0;
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 720px;
 }
 
 .section-heading {
@@ -2064,12 +2064,13 @@ html[data-theme='dark'] .faq-accordion .accordion-button:not(.collapsed) {
 
 .site-footer {
   background: var(--brand-dark);
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.88);
   padding: 4rem 0 1.5rem;
   margin-top: 3rem;
 }
 
-.site-footer h6 {
+.site-footer h6,
+.site-footer .footer-heading {
   color: #fff;
   font-family: var(--font-ui);
   font-weight: 700;
@@ -2080,7 +2081,7 @@ html[data-theme='dark'] .faq-accordion .accordion-button:not(.collapsed) {
 }
 
 .site-footer a {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .site-footer a:hover {
@@ -3558,9 +3559,4 @@ html[data-theme='dark'] .vc-preview-loading {
 
 html[data-theme='dark'] .vc-logo-preview {
   background: #1a1f1c;
-}
-
-.site-footer {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 420px;
 }

@@ -8,7 +8,7 @@
     <div class="breath-card__top">
         <div>
             <span class="eyebrow"><i class="bi bi-lungs" aria-hidden="true"></i> {{ __('home.breath.eyebrow') }}</span>
-            <h2 class="breath-card__title">{{ __('home.breath.title') }}</h2>
+            <p class="breath-card__title">{{ __('home.breath.title') }}</p>
         </div>
         <div class="breath-card__timer" :class="{ 'is-holding': phase === 'holding', 'is-done': phase === 'done' }" x-text="displayTime"></div>
     </div>

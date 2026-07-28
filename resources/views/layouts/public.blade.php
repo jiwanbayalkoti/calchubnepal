@@ -19,9 +19,9 @@
     {{-- Critical above-the-fold CSS (inline) — improves FCP/LCP --}}
     @include('partials.critical-css')
 
-    {{-- Fonts: fewer weights + non-blocking load (display=swap already set) --}}
+    {{-- Fonts: display=optional avoids late font swaps delaying LCP --}}
     @php
-        $fontCss = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap';
+        $fontCss = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=optional';
         $bootstrapCss = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css';
         $iconsCss = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
         $appCssFile = is_file(public_path('css/calculator-hub.min.css'))
@@ -40,17 +40,11 @@
         $loadSwal = request()->routeIs('calculators.*', 'contact') || auth()->check();
     @endphp
 
-    <link rel="preload" as="style" href="{{ $fontCss }}">
+    {{-- ALL stylesheets non-blocking — critical CSS above covers first paint --}}
     @include('partials.async-css', ['href' => $fontCss])
-
-    {{-- Bootstrap grid is required for layout stability (CLS) — keep blocking but preload --}}
-    <link rel="preload" as="style" href="{{ $bootstrapCss }}">
-    <link rel="stylesheet" href="{{ $bootstrapCss }}">
-
-    {{-- Icons + app CSS: icons non-blocking; app CSS blocking for visual stability --}}
+    @include('partials.async-css', ['href' => $bootstrapCss])
     @include('partials.async-css', ['href' => $iconsCss])
-    <link rel="preload" as="style" href="{{ $appCss }}">
-    <link rel="stylesheet" href="{{ $appCss }}">
+    @include('partials.async-css', ['href' => $appCss])
 
     @if ($loadSelect2)
         @include('partials.async-css', ['href' => 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'])
@@ -351,7 +345,7 @@
             </div>
 
             <div class="col-6 col-lg-2">
-                <h6>{{ __('footer.company') }}</h6>
+                <p class="footer-heading">{{ __('footer.company') }}</p>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ route('about') }}">{{ __('footer.about') }}</a></li>
                     <li class="mb-2"><a href="{{ route('qr-code-generator') }}">{{ __('footer.qr') }}</a></li>
@@ -363,7 +357,7 @@
             </div>
 
             <div class="col-6 col-lg-3">
-                <h6>{{ __('footer.categories') }}</h6>
+                <p class="footer-heading">{{ __('footer.categories') }}</p>
                 <ul class="list-unstyled">
                     @foreach(\Illuminate\Support\Facades\Cache::remember('calc_hub:footer:categories', 3600, function () {
                         return \App\Models\CalculatorCategory::query()
@@ -383,7 +377,7 @@
             </div>
 
             <div class="col-6 col-lg-3">
-                <h6>{{ __('footer.legal') }}</h6>
+                <p class="footer-heading">{{ __('footer.legal') }}</p>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ route('privacy') }}">{{ __('footer.privacy') }}</a></li>
                     <li class="mb-2"><a href="{{ route('terms') }}">{{ __('footer.terms') }}</a></li>

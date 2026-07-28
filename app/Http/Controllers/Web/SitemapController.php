@@ -22,14 +22,19 @@ class SitemapController extends Controller
 
     public function robots(): Response
     {
-        $sitemapUrl = rtrim((string) config('app.url'), '/').'/sitemap.xml';
+        // Prefer the current request host so Sitemap is always an absolute URL.
+        // A wrong/relative APP_URL commonly triggers Lighthouse "robots.txt is not valid".
+        $sitemapUrl = url('/sitemap.xml');
+        if (! str_starts_with($sitemapUrl, 'http')) {
+            $sitemapUrl = rtrim((string) config('app.url'), '/').'/sitemap.xml';
+        }
+
         $body = implode("\n", [
             'User-agent: *',
             'Allow: /',
-            '',
-            'Disallow: /admin',
-            'Disallow: /account',
-            'Disallow: /advertiser',
+            'Disallow: /admin/',
+            'Disallow: /account/',
+            'Disallow: /advertiser/',
             'Disallow: /login',
             'Disallow: /register',
             'Disallow: /dashboard',
@@ -40,6 +45,9 @@ class SitemapController extends Controller
             '',
         ]);
 
-        return response($body, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+        return response($body, 200, [
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Cache-Control' => 'public, max-age=3600',
+        ]);
     }
 }
