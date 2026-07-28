@@ -29,7 +29,6 @@ use App\Services\Settings\AppSettings;
 use App\Services\Settings\SettingsService;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -76,15 +75,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrapFive();
-
-        // Production: all generated URLs (canonical, routes, sitemap) use APP_URL.
-        if ($this->app->isProduction()) {
-            URL::forceScheme('https');
-            $root = rtrim((string) config('app.url'), '/');
-            if ($root !== '') {
-                URL::forceRootUrl($root);
-            }
-        }
 
         Gate::policy(Calculator::class, CalculatorPolicy::class);
         Gate::policy(BlogPost::class, BlogPostPolicy::class);
