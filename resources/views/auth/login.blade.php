@@ -8,7 +8,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login') }}" class="auth-form" novalidate>
+    <form method="POST" action="{{ route('login', [], false) }}" class="auth-form" novalidate>
         @csrf
 
         <div class="mb-3">

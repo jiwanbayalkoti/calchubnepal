@@ -23,7 +23,7 @@
                 <div id="authPanelLogin" class="auth-modal-panel">
                     <div class="auth-modal-alert d-none" id="loginAlert" role="alert"></div>
 
-                    <form id="authLoginForm" class="auth-form" method="POST" action="{{ route('login') }}" novalidate>
+                    <form id="authLoginForm" class="auth-form" method="POST" action="{{ route('login', [], false) }}" novalidate>
                         @csrf
                         <div class="mb-3">
                             <label for="modal_login_email" class="form-label">{{ __('auth.email') }}</label>
@@ -63,7 +63,7 @@
                 <div id="authPanelRegister" class="auth-modal-panel d-none">
                     <div class="auth-modal-alert d-none" id="registerAlert" role="alert"></div>
 
-                    <form id="authRegisterForm" class="auth-form" method="POST" action="{{ route('register') }}" novalidate>
+                    <form id="authRegisterForm" class="auth-form" method="POST" action="{{ route('register', [], false) }}" novalidate>
                         @csrf
                         <div class="mb-3">
                             <label for="modal_register_name" class="form-label">{{ __('auth.name') }}</label>

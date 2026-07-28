@@ -20,14 +20,14 @@
         </div>
 
         <div class="row g-4 align-items-start" id="qrGeneratorApp"
-             data-preview-url="{{ route('qr-code-generator.preview') }}"
-             data-download-url="{{ route('qr-code-generator.download') }}"
-             data-logo-url="{{ route('qr-code-generator.logo') }}"
-             data-recent-url="{{ route('qr-code-generator.recent') }}"
-             data-saved-url="{{ route('qr-code-generator.saved') }}"
-             data-save-url="{{ url('/qr-code-generator') }}"
-             data-dynamic-url="{{ $isAuthenticated ? route('qr-code-generator.dynamic') : '' }}"
-             data-login-url="{{ route('login') }}"
+             data-preview-url="{{ route('qr-code-generator.preview', [], false) }}"
+             data-download-url="{{ route('qr-code-generator.download', [], false) }}"
+             data-logo-url="{{ route('qr-code-generator.logo', [], false) }}"
+             data-recent-url="{{ route('qr-code-generator.recent', [], false) }}"
+             data-saved-url="{{ route('qr-code-generator.saved', [], false) }}"
+             data-save-url="/qr-code-generator"
+             data-dynamic-url="{{ $isAuthenticated ? route('qr-code-generator.dynamic', [], false) : '' }}"
+             data-login-url="{{ route('login', [], false) }}"
              data-authenticated="{{ $isAuthenticated ? '1' : '0' }}">
             <div class="col-lg-7">
                 <form id="qrGeneratorForm" class="qr-panel card-surface p-4 p-md-4" novalidate enctype="multipart/form-data">

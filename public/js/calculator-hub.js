@@ -7,11 +7,40 @@
 (function ($) {
   'use strict';
 
-  const csrfToken = $('meta[name="csrf-token"]').attr('content');
+  function getCsrfToken() {
+    return $('meta[name="csrf-token"]').attr('content')
+      || $('input[name="_token"]').first().val()
+      || '';
+  }
+
+  function getXsrfToken() {
+    const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  function csrfHeaders() {
+    const headers = {
+      'X-CSRF-TOKEN': getCsrfToken(),
+      'X-Requested-With': 'XMLHttpRequest',
+    };
+    const xsrf = getXsrfToken();
+    if (xsrf) {
+      headers['X-XSRF-TOKEN'] = xsrf;
+    }
+    return headers;
+  }
+
+  const csrfToken = getCsrfToken(); // legacy; prefer getCsrfToken() / csrfHeaders()
 
   if (window.$ && $.ajaxSetup) {
     $.ajaxSetup({
-      headers: { 'X-CSRF-TOKEN': csrfToken },
+      headers: csrfHeaders(),
+      beforeSend: function (xhr) {
+        const headers = csrfHeaders();
+        Object.keys(headers).forEach(function (key) {
+          xhr.setRequestHeader(key, headers[key]);
+        });
+      },
     });
   }
 
@@ -573,11 +602,7 @@
       url: '/calculator/' + slug + '/explain',
       method: 'POST',
       dataType: 'json',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': csrfToken,
-      },
+      headers: csrfHeaders({ Accept: 'application/json' }),
       data: {
         inputs: inputs,
         results: lastResult.results || {},
@@ -626,7 +651,7 @@
     }
 
     const $form = $('<form>', { method: 'POST', action: '/calculator/' + slug + '/pdf', target: '_blank' });
-    $form.append($('<input>', { type: 'hidden', name: '_token', value: csrfToken }));
+    $form.append($('<input>', { type: 'hidden', name: '_token', value: getCsrfToken() }));
     $form.append($('<input>', { type: 'hidden', name: 'inputs', value: JSON.stringify(lastResult.inputs || {}) }));
     $form.append($('<input>', { type: 'hidden', name: 'results', value: JSON.stringify(lastResult.results || {}) }));
     $form.append($('<input>', { type: 'hidden', name: 'breakdown', value: JSON.stringify(lastResult.breakdown || {}) }));
@@ -798,11 +823,7 @@
       url: url,
       method: 'POST',
       dataType: 'json',
-      headers: {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': csrfToken,
-      },
+      headers: csrfHeaders({ Accept: 'application/json' }),
     })
       .done(function (response) {
         const favorited = !!response.favorited;
@@ -890,11 +911,7 @@
           inputs: lastResult.inputs || {},
           outputs: lastResult.results || {},
         }),
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': csrfToken,
-        },
+        headers: csrfHeaders({ Accept: 'application/json' }),
       })
         .done(function (response) {
           if (window.toastr) {
@@ -1043,11 +1060,9 @@
         method: 'POST',
         data: $form.serialize(),
         dataType: 'json',
-        headers: {
+        headers: Object.assign({
           'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': csrfToken,
-        },
+        }, csrfHeaders()),
       })
         .done(function (response) {
           if (window.toastr) {
@@ -1070,11 +1085,9 @@
               data: JSON.stringify({ claim_token: token }),
               contentType: 'application/json',
               dataType: 'json',
-              headers: {
+              headers: Object.assign({
                 'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken,
-              },
+              }, csrfHeaders()),
             })
               .done(function (claim) {
                 localStorage.removeItem('breath_hold_claim_token');

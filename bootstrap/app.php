@@ -3,6 +3,7 @@
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsAdvertiser;
+use App\Http\Middleware\ForcePreferredHost;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\TrackPageView;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Trust reverse proxies (Cloudflare / nginx) so $request->ip() and
         // CF-IPCountry reflect the real visitor for analytics.
         $middleware->trustProxies(at: '*');
+
+        $middleware->web(prepend: [
+            ForcePreferredHost::class,
+        ]);
 
         $middleware->web(append: [
             SetLocale::class,

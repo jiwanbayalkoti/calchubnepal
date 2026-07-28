@@ -2,7 +2,7 @@
     title="Confirm password"
     subtitle="This is a secure area. Please confirm your password to continue."
 >
-    <form method="POST" action="{{ route('password.confirm') }}" class="auth-form" novalidate>
+    <form method="POST" action="{{ route('password.confirm', [], false) }}" class="auth-form" novalidate>
         @csrf
 
         <div class="mb-4">

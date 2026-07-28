@@ -2,7 +2,7 @@
     title="Create your account"
     subtitle="Join AI Calculator Hub to save work, get AI explanations, and access premium calculators."
 >
-    <form method="POST" action="{{ route('register') }}" class="auth-form" novalidate>
+    <form method="POST" action="{{ route('register', [], false) }}" class="auth-form" novalidate>
         @csrf
 
         <div class="mb-3">

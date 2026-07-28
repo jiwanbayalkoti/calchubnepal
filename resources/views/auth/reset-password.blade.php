@@ -2,7 +2,7 @@
     title="Choose a new password"
     subtitle="Pick a strong password you haven’t used here before."
 >
-    <form method="POST" action="{{ route('password.store') }}" class="auth-form" novalidate>
+    <form method="POST" action="{{ route('password.store', [], false) }}" class="auth-form" novalidate>
         @csrf
 
         <input type="hidden" name="token" value="{{ $request->route('token') }}">

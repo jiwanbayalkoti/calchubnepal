@@ -25,7 +25,7 @@ class SeoService
             'title' => $this->hub->defaultMetaTitle(),
             'description' => $this->hub->defaultMetaDescription(),
             'keywords' => null,
-            'canonical' => url()->current(),
+            'canonical' => $this->normalizeCanonical(url()->current()),
             'og_image' => null,
             'robots' => 'index,follow',
         ];
@@ -34,12 +34,43 @@ class SeoService
             'title' => $page->meta_title ?: $page->title,
             'description' => $page->meta_description,
             'keywords' => $page->meta_keywords,
-            'canonical' => $page->canonical_url ?: url()->current(),
+            'canonical' => $page->canonical_url ?: $this->normalizeCanonical(url()->current()),
             'og_image' => $page->og_image,
             'robots' => $page->robots ?: 'index,follow',
         ], static fn ($value) => $value !== null) : [];
 
-        return array_merge($defaults, $fromPage, $overrides);
+        $meta = array_merge($defaults, $fromPage, $overrides);
+
+        if (! empty($meta['canonical'])) {
+            $meta['canonical'] = $this->normalizeCanonical((string) $meta['canonical']);
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Force canonical onto APP_URL host (https://calchubnepal.com/...).
+     * Does NOT use URL::forceRootUrl — that breaks CSRF when www/http variants exist.
+     */
+    public function normalizeCanonical(string $url): string
+    {
+        $root = rtrim((string) config('app.url'), '/');
+        $rootParts = parse_url($root) ?: [];
+
+        if ($url === '' || $url === '/') {
+            return $root.'/';
+        }
+
+        if (str_starts_with($url, '/')) {
+            return $root.$url;
+        }
+
+        $parts = parse_url($url) ?: [];
+        $path = $parts['path'] ?? '/';
+        $scheme = $rootParts['scheme'] ?? 'https';
+        $host = $rootParts['host'] ?? ($parts['host'] ?? 'localhost');
+
+        return $scheme.'://'.$host.$path;
     }
 
     /**

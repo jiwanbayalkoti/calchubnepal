@@ -16,7 +16,30 @@
   const saveBaseUrl = root.dataset.saveUrl || '';
   const dynamicUrl = root.dataset.dynamicUrl || '';
   const isAuthenticated = root.dataset.authenticated === '1';
-  const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+  function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+      || form?.querySelector('input[name="_token"]')?.value
+      || '';
+  }
+
+  function getXsrfToken() {
+    const match = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  function csrfHeaders(extra) {
+    const headers = Object.assign({
+      'X-CSRF-TOKEN': getCsrfToken(),
+      'X-Requested-With': 'XMLHttpRequest',
+      Accept: 'application/json',
+    }, extra || {});
+    const xsrf = getXsrfToken();
+    if (xsrf) {
+      headers['X-XSRF-TOKEN'] = xsrf;
+    }
+    return headers;
+  }
 
   const els = {
     image: document.getElementById('qrPreviewImage'),
@@ -213,11 +236,7 @@
       data: fd,
       processData: false,
       contentType: false,
-      headers: {
-        'X-CSRF-TOKEN': csrf,
-        Accept: 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: csrfHeaders(),
     })
       .done(function (res) {
         if (seq !== requestSeq) return;
@@ -258,11 +277,9 @@
 
     fetch(downloadUrl, {
       method: 'POST',
-      headers: {
+      headers: csrfHeaders({
         Accept: 'application/json, image/*, application/pdf',
-        'X-CSRF-TOKEN': csrf,
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      }),
       body: fd,
     })
       .then(async (res) => {
@@ -310,11 +327,7 @@
       data: fd,
       processData: false,
       contentType: false,
-      headers: {
-        'X-CSRF-TOKEN': csrf,
-        Accept: 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: csrfHeaders(),
     })
       .done(function (res) {
         if (res.success && res.data?.logo_token) {
@@ -452,11 +465,7 @@
     $.ajax({
       url: saveBaseUrl.replace(/\/$/, '') + '/' + encodeURIComponent(uuid) + '/save',
       method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': csrf,
-        Accept: 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: csrfHeaders(),
     })
       .done(function (res) {
         if (res.success) {
@@ -474,11 +483,7 @@
     $.ajax({
       url: saveBaseUrl.replace(/\/$/, '') + '/' + encodeURIComponent(uuid),
       method: 'DELETE',
-      headers: {
-        'X-CSRF-TOKEN': csrf,
-        Accept: 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
+      headers: csrfHeaders(),
     })
       .done(function (res) {
         if (res.success) {
@@ -650,7 +655,7 @@
       data: fd,
       processData: false,
       contentType: false,
-      headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
+      headers: csrfHeaders(),
     })
       .done(function (res) {
         if (!res.success || !res.data) {
