@@ -23,20 +23,29 @@
             if (window.__calcHubAdsense.loaded) return;
             window.__calcHubAdsense.loaded = true;
 
-            var s = document.createElement('script');
-            s.async = true;
-            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='
-                + encodeURIComponent(window.__calcHubAdsense.clientId);
-            s.crossOrigin = 'anonymous';
-            document.head.appendChild(s);
+            var inject = function () {
+                var s = document.createElement('script');
+                s.async = true;
+                s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='
+                    + encodeURIComponent(window.__calcHubAdsense.clientId);
+                s.crossOrigin = 'anonymous';
+                document.head.appendChild(s);
 
-            s.addEventListener('load', function () {
-                try {
-                    document.querySelectorAll('ins.adsbygoogle').forEach(function () {
-                        (window.adsbygoogle = window.adsbygoogle || []).push({});
-                    });
-                } catch (e) { /* ignore */ }
-            });
+                s.addEventListener('load', function () {
+                    try {
+                        document.querySelectorAll('ins.adsbygoogle').forEach(function () {
+                            (window.adsbygoogle = window.adsbygoogle || []).push({});
+                        });
+                    } catch (e) { /* ignore */ }
+                });
+            };
+
+            // Delay AdSense until the browser is idle so it does not inflate TBT.
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(inject, { timeout: 3500 });
+            } else {
+                setTimeout(inject, 2000);
+            }
         };
     </script>
 @endif

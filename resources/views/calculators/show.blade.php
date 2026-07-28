@@ -230,15 +230,23 @@
     </section>
 @endsection
 
+@php
+    $needsNepaliDatepicker = collect($calculator->input_schema ?? [])
+        ->contains(fn ($field) => ($field['type'] ?? null) === 'bs_date');
+@endphp
+
 @push('styles')
-<link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css">
+@if ($needsNepaliDatepicker)
+<link rel="stylesheet" href="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/css/nepali.datepicker.v5.0.6.min.css" media="print" onload="this.media='all'">
 <style>
     .ndp-nepali-calendar { z-index: 2050 !important; }
     .js-bs-datepicker { cursor: pointer; background: var(--card); }
 </style>
+@endif
 @endpush
 
 @push('scripts')
+@if ($needsNepaliDatepicker)
 <script src="https://nepalidatepicker.sajanmaharjan.com.np/v5/nepali.datepicker/js/nepali.datepicker.v5.0.6.min.js"></script>
 <script>
 (function () {
@@ -270,4 +278,5 @@
     syncDirectionFields();
 })();
 </script>
+@endif
 @endpush

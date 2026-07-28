@@ -6,17 +6,41 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0B6E4F">
 
+    @php
+        $meta = [
+            'title' => ($title ? $title.' | ' : '').$hub->siteName(),
+            'robots' => 'noindex,follow',
+        ];
+    @endphp
+    @include('partials.seo-meta')
     @include('partials.gtag')
 
-    <title>{{ $title ? $title.' | ' : '' }}{{ $hub->siteName() }}</title>
-
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{{ asset('css/calculator-hub.css') }}?v={{ @filemtime(public_path('css/calculator-hub.css')) ?: '1' }}">
+    @include('partials.critical-css')
+
+    @php
+        $fontCss = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;700&display=swap';
+        $bootstrapCss = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css';
+        $iconsCss = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css';
+        $appCssFile = is_file(public_path('css/calculator-hub.min.css'))
+            ? 'css/calculator-hub.min.css'
+            : 'css/calculator-hub.css';
+        $appJsFile = is_file(public_path('js/calculator-hub.min.js'))
+            ? 'js/calculator-hub.min.js'
+            : 'js/calculator-hub.js';
+        $appCss = asset($appCssFile).'?v='.(@filemtime(public_path($appCssFile)) ?: '1');
+        $appJs = asset($appJsFile).'?v='.(@filemtime(public_path($appJsFile)) ?: '1');
+    @endphp
+
+    @include('partials.async-css', ['href' => $fontCss])
+    <link rel="stylesheet" href="{{ $bootstrapCss }}">
+    @include('partials.async-css', ['href' => $iconsCss])
+    <link rel="stylesheet" href="{{ $appCss }}">
+
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="icon" href="{{ asset('favicon-32x32.png') }}" type="image/png" sizes="32x32">
@@ -70,6 +94,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('js/calculator-hub.js') }}?v={{ @filemtime(public_path('js/calculator-hub.js')) ?: '1' }}"></script>
+<script src="{{ $appJs }}"></script>
 </body>
 </html>

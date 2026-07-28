@@ -4,7 +4,7 @@
     $metaDescription = $meta['description'] ?? 'Free, accurate, AI-powered calculators for finance, health, construction, math and everyday life.';
     $metaKeywords = $meta['keywords'] ?? null;
     $metaCanonical = $meta['canonical'] ?? url()->current();
-    $metaImage = $meta['og_image'] ?? asset('images/og-default.png');
+    $metaImage = $meta['og_image'] ?? asset('images/og-default.webp');
     $metaRobots = $meta['robots'] ?? 'index,follow';
 @endphp
 

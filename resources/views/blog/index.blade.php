@@ -20,7 +20,7 @@
                     <div class="row g-0">
                         @if($featured->featured_image)
                             <div class="col-md-5">
-                                <img src="{{ asset('storage/'.$featured->featured_image) }}" class="w-100 h-100" style="object-fit:cover;min-height:220px;" alt="{{ $featured->title }}">
+                                <img src="{{ asset('storage/'.$featured->featured_image) }}" class="w-100 h-100" style="object-fit:cover;min-height:220px;" width="600" height="320" fetchpriority="high" decoding="async" alt="{{ $featured->title }}">
                             </div>
                         @endif
                         <div class="col-md-7 p-4 d-flex flex-column justify-content-center">
@@ -40,7 +40,7 @@
                             <div class="col-md-4">
                                 <a href="{{ route('blog.show', $post) }}" class="card-surface blog-card d-block h-100 text-decoration-none overflow-hidden">
                                     @if($post->featured_image)
-                                        <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100" style="height:170px;object-fit:cover;" alt="{{ $post->title }}">
+                                        <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100" style="height:170px;object-fit:cover;" width="400" height="170" loading="lazy" decoding="async" alt="{{ $post->title }}">
                                     @endif
                                     <div class="p-3">
                                         <span class="badge-soft-brand mb-2 d-inline-block">{{ $post->category?->name ?? 'General' }}</span>

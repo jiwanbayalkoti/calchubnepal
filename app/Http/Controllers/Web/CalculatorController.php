@@ -66,7 +66,11 @@ class CalculatorController extends Controller
     {
         abort_unless($calculator->is_active, 404);
 
-        $calculator->increment('views_count');
+        $calculatorId = $calculator->id;
+        dispatch(static function () use ($calculatorId): void {
+            \App\Models\Calculator::query()->whereKey($calculatorId)->increment('views_count');
+        })->afterResponse();
+
         $calculator->load(['category', 'faqs' => fn ($q) => $q->active(), 'examples']);
 
         $related = $this->calculators->getRelated($calculator, 6);

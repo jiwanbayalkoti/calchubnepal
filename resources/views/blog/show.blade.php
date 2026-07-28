@@ -22,7 +22,7 @@
                     </p>
 
                     @if($post->featured_image)
-                        <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100 mb-4" style="max-height:420px;object-fit:cover;border-radius:var(--radius-md);" alt="{{ $post->title }}">
+                        <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100 mb-4" style="max-height:420px;object-fit:cover;border-radius:var(--radius-md);" width="800" height="420" fetchpriority="high" decoding="async" alt="{{ $post->title }}">
                     @endif
 
                     <div class="blog-content" id="blogArticleContent">

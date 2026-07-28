@@ -109,7 +109,7 @@
                         <div class="col-md-4">
                             <a href="{{ route('blog.show', $post) }}" class="card-surface blog-card d-block h-100 text-decoration-none overflow-hidden">
                                 @if($post->featured_image)
-                                    <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100" style="height:180px;object-fit:cover;" alt="{{ $post->title }}">
+                                    <img src="{{ asset('storage/'.$post->featured_image) }}" class="w-100" style="height:180px;object-fit:cover;" width="400" height="180" loading="lazy" decoding="async" alt="{{ $post->title }}">
                                 @endif
                                 <div class="p-3">
                                     <span class="badge-soft-brand mb-2 d-inline-block">{{ $post->category?->name ?? __('home.general') }}</span>

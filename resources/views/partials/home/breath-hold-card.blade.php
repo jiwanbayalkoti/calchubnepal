@@ -18,8 +18,8 @@
             <span class="breath-card__zone breath-card__zone--poor" style="width:33.333%"></span>
             <span class="breath-card__zone breath-card__zone--medium" style="width:33.333%"></span>
             <span class="breath-card__zone breath-card__zone--healthy" style="width:33.334%"></span>
-            <span class="breath-card__fill" :style="'width:' + progressPct + '%'"></span>
-            <span class="breath-card__marker" :style="'left:' + progressPct + '%'"></span>
+            <span class="breath-card__fill" :style="'transform:scaleX(' + (progressPct / 100) + ')'"></span>
+            <span class="breath-card__marker" :style="'transform:translate3d(' + progressPct + '%, -50%, 0)'"></span>
         </div>
         <div class="breath-card__scale">
             <span>0</span>

@@ -13,13 +13,25 @@
     $clickUrl = $ad['click_url'] ?? ($ad['link_url'] ?? null);
     $impressionUrl = $ad['impression_url'] ?? null;
     $image = $ad['image'] ?? null;
-    $imageUrl = $image
-        ? (str_starts_with($image, 'http') ? $image : asset('storage/'.$image))
-        : null;
+    $imageUrl = null;
+    $imageWidth = null;
+    $imageHeight = null;
+    if ($image) {
+        if (str_starts_with($image, 'http')) {
+            $imageUrl = $image;
+        } else {
+            $webpRel = preg_replace('/\.(png|jpe?g)$/i', '.webp', $image);
+            if ($webpRel && $webpRel !== $image && is_file(storage_path('app/public/'.$webpRel))) {
+                $imageUrl = asset('storage/'.$webpRel);
+            } else {
+                $imageUrl = asset('storage/'.$image);
+            }
+        }
+    }
 @endphp
 
 @if ($impressionUrl)
-    <img src="{{ $impressionUrl }}" alt="" width="1" height="1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" loading="lazy">
+    <img src="{{ $impressionUrl }}" alt="" width="1" height="1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;" loading="lazy" decoding="async">
 @endif
 
 @if (! empty($ad['adsense_code']) && empty($ad['content']) && empty($image))
@@ -29,7 +41,7 @@
 @elseif ($imageUrl)
     <a href="{{ $clickUrl ?: '#' }}" class="ad-banner-slide ad-banner-image {{ $clickUrl ? '' : 'pe-none' }}"
        @if($clickUrl) target="_blank" rel="noopener sponsored" @endif>
-        <img src="{{ $imageUrl }}" alt="{{ $title }}" class="ad-banner-img">
+        <img src="{{ $imageUrl }}" alt="{{ $title }}" class="ad-banner-img" loading="lazy" decoding="async" width="728" height="90">
         <span class="ad-banner-sponsored">Sponsored</span>
     </a>
 @elseif ($isHtml)

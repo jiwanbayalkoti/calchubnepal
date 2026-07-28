@@ -21,7 +21,12 @@ class TrackPageView
         $response = $next($request);
 
         if ($this->shouldTrack($request, $response)) {
-            $this->pageViews->record($request);
+            // Defer analytics I/O (DB + optional geo HTTP) until after the response
+            // is sent so TTFB / LCP are not blocked by page-view recording.
+            $pageViews = $this->pageViews;
+            dispatch(static function () use ($pageViews, $request): void {
+                $pageViews->record($request);
+            })->afterResponse();
         }
 
         return $response;
