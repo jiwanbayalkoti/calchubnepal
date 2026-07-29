@@ -4,6 +4,7 @@ namespace App\Services\Calculators;
 
 use App\Contracts\Calculators\CalculatorHandlerInterface;
 use App\Models\Calculator;
+use App\Services\Calculators\Catalog\FormulaCatalog;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -25,9 +26,7 @@ class CalculatorRegistry
 
     protected bool $discovered = false;
 
-    public function __construct(protected Container $container)
-    {
-    }
+    public function __construct(protected Container $container) {}
 
     public function register(CalculatorHandlerInterface $handler): void
     {
@@ -39,6 +38,10 @@ class CalculatorRegistry
         $this->discoverIfNeeded();
 
         if (isset($this->handlers[$key])) {
+            return true;
+        }
+
+        if ($this->formulaCatalog()->has($key)) {
             return true;
         }
 
@@ -54,11 +57,22 @@ class CalculatorRegistry
             return $this->handlers[$key];
         }
 
+        $definition = $this->formulaCatalog()->get($key);
+
+        if ($definition !== null) {
+            return new ConfigurableCalculatorHandler($key, $definition);
+        }
+
         if (Calculator::query()->where('formula_key', $key)->where('is_active', true)->exists()) {
             return new DynamicStubHandler($key);
         }
 
         throw new InvalidArgumentException("No calculator handler registered for key [{$key}].");
+    }
+
+    protected function formulaCatalog(): FormulaCatalog
+    {
+        return $this->container->make(FormulaCatalog::class);
     }
 
     /**
