@@ -12,10 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TrackPageView
 {
-    public function __construct(protected PageViewService $pageViews)
-    {
-    }
-
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
@@ -23,9 +19,10 @@ class TrackPageView
         if ($this->shouldTrack($request, $response)) {
             // Defer analytics I/O (DB + optional geo HTTP) until after the response
             // is sent so TTFB / LCP are not blocked by page-view recording.
-            $pageViews = $this->pageViews;
-            dispatch(static function () use ($pageViews, $request): void {
-                $pageViews->record($request);
+            // Do not capture $request / PageViewService — they hold PDO and cannot
+            // be serialized into CallQueuedClosure (even on the sync queue).
+            dispatch(static function (): void {
+                app(PageViewService::class)->record(request());
             })->afterResponse();
         }
 
@@ -50,6 +47,11 @@ class TrackPageView
             return false;
         }
 
+        // Tracking pixels / binary assets must never count as page views.
+        if ($this->isNonHtmlResponse($response)) {
+            return false;
+        }
+
         if ($this->looksLikeBot($request->userAgent())) {
             return false;
         }
@@ -66,6 +68,10 @@ class TrackPageView
             'api/*',
             'account',
             'account/*',
+            'advertiser',
+            'advertiser/*',
+            'ads',
+            'ads/*',
             'sanctum/*',
             'up',
             'livewire/*',
@@ -78,6 +84,7 @@ class TrackPageView
             'js/*',
             'favicon*',
             'sitemap.xml',
+            'robots.txt',
             'auth/google',
             'auth/google/*',
         )) {
@@ -91,9 +98,29 @@ class TrackPageView
             'verification.*',
             'locale.switch',
             'sitemap.xml',
+            'ads.impression',
+            'ads.adsense.impression',
+            'ads.click',
             'auth.google.redirect',
             'auth.google.callback',
         );
+    }
+
+    protected function isNonHtmlResponse(Response $response): bool
+    {
+        $contentType = strtolower((string) $response->headers->get('Content-Type', ''));
+
+        if ($contentType === '') {
+            return false;
+        }
+
+        return str_starts_with($contentType, 'image/')
+            || str_starts_with($contentType, 'font/')
+            || str_starts_with($contentType, 'audio/')
+            || str_starts_with($contentType, 'video/')
+            || str_contains($contentType, 'application/octet-stream')
+            || str_contains($contentType, 'application/javascript')
+            || str_contains($contentType, 'text/css');
     }
 
     protected function looksLikeBot(?string $userAgent): bool
