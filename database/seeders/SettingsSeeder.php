@@ -21,6 +21,7 @@ class SettingsSeeder extends Seeder
     protected const SETTINGS = [
         // Site
         ['group' => 'site', 'key' => 'name', 'value' => 'Calculator Hub', 'type' => 'string', 'is_public' => true],
+        ['group' => 'site', 'key' => 'logo', 'value' => '', 'type' => 'string', 'is_public' => true],
         ['group' => 'site', 'key' => 'tagline', 'value' => 'Free Online Calculators for Construction, Finance, Health & More', 'type' => 'string', 'is_public' => true],
         ['group' => 'site', 'key' => 'support_email', 'value' => 'support@calculatorhub.com', 'type' => 'string', 'is_public' => true],
         ['group' => 'site', 'key' => 'default_locale', 'value' => 'en', 'type' => 'string', 'is_public' => true],

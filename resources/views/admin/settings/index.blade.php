@@ -8,6 +8,36 @@
 @endpush
 
 @section('content')
+    <div class="card card-primary card-outline mb-3">
+        <div class="card-header">
+            <h3 class="card-title mb-0"><i class="fas fa-image mr-1"></i> Site Logo</h3>
+        </div>
+        <div class="card-body">
+            <div class="d-flex align-items-center flex-wrap" style="gap:1.25rem;">
+                <div class="text-center p-2" style="background:#f4f6f9;border:1px dashed #ced4da;border-radius:.5rem;min-width:180px;min-height:80px;display:flex;align-items:center;justify-content:center;">
+                    <img id="logo-preview" src="{{ $hub->logoUrl() }}" alt="{{ $hub->siteName() }} logo"
+                         style="max-height:64px;max-width:240px;{{ $hub->hasLogo() ? '' : 'display:none;' }}">
+                    <span id="logo-empty" class="text-muted small" style="{{ $hub->hasLogo() ? 'display:none;' : '' }}">No logo uploaded</span>
+                </div>
+                <form id="logo-form" class="flex-grow-1" style="min-width:260px;">
+                    <label class="font-weight-bold">Upload logo</label>
+                    <input type="file" id="logo-input" name="logo"
+                           accept=".png,.jpg,.jpeg,.webp,.svg,.gif" class="form-control-file mb-2">
+                    <div>
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-upload"></i> Upload Logo</button>
+                        <button type="button" id="logo-remove" class="btn btn-outline-danger btn-sm {{ $hub->hasLogo() ? '' : 'd-none' }}">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-1">
+                        PNG, JPG, SVG, WEBP or GIF — max 2&nbsp;MB. Shown in the public site header &amp; footer.
+                        If no logo is set, the site name is displayed instead.
+                    </small>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="card card-primary card-outline card-outline-tabs">
         <div class="card-header p-0 border-bottom-0">
             <ul class="nav nav-tabs" role="tablist">
@@ -96,6 +126,60 @@ $(function () {
 
     $(document).on('click', '.btn-remove-row', function () {
         $(this).closest('.setting-row').remove();
+    });
+
+    $('#logo-form').on('submit', function (e) {
+        e.preventDefault();
+        const input = document.getElementById('logo-input');
+        if (!input.files.length) {
+            toastr.warning('Please choose an image first.');
+            return;
+        }
+
+        const $btn = $(this).find('[type=submit]');
+        const fd = new FormData();
+        fd.append('logo', input.files[0]);
+
+        AdminCRUD.toggleLoading($btn, true);
+
+        $.ajax({
+            url: '{{ route("admin.settings.logo.upload") }}',
+            method: 'POST',
+            data: fd,
+            processData: false,
+            contentType: false,
+        })
+            .done((res) => {
+                toastr.success(res.message || 'Logo uploaded.');
+                if (res.url) {
+                    const bust = res.url + (res.url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                    $('#logo-preview').attr('src', bust).show();
+                    $('#logo-empty').hide();
+                    $('#logo-remove').removeClass('d-none');
+                }
+                input.value = '';
+            })
+            .fail((xhr) => AdminCRUD.notifyError(xhr, 'Unable to upload logo.'))
+            .always(() => AdminCRUD.toggleLoading($btn, false));
+    });
+
+    $('#logo-remove').on('click', function () {
+        const $btn = $(this);
+        AdminCRUD.toggleLoading($btn, true);
+
+        $.ajax({
+            url: '{{ route("admin.settings.logo.remove") }}',
+            method: 'POST',
+            data: { _method: 'DELETE' },
+        })
+            .done((res) => {
+                toastr.success(res.message || 'Logo removed.');
+                $('#logo-preview').attr('src', '').hide();
+                $('#logo-empty').show();
+                $btn.addClass('d-none');
+            })
+            .fail((xhr) => AdminCRUD.notifyError(xhr, 'Unable to remove logo.'))
+            .always(() => AdminCRUD.toggleLoading($btn, false));
     });
 
     $('.settings-form').on('submit', function (e) {

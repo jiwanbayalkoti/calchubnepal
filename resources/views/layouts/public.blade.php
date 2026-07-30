@@ -86,8 +86,12 @@
     <nav class="navbar navbar-expand-lg py-2">
         <div class="container align-items-center">
             <a class="brand-logo" href="{{ route('home') }}">
-                <span class="brand-mark"><i class="bi bi-calculator"></i></span>
-                <span>{{ $hub->siteName() }}</span>
+                @if ($hub->hasLogo())
+                    <img src="{{ $hub->logoUrl() }}" alt="{{ $hub->siteName() }}" style="max-height:40px;width:auto;">
+                @else
+                    <span class="brand-mark"><i class="bi bi-calculator"></i></span>
+                    <span>{{ $hub->siteName() }}</span>
+                @endif
             </a>
 
             <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="{{ __('nav.menu') }}">
@@ -330,8 +334,12 @@
         <div class="row g-4">
             <div class="col-lg-4">
                 <a class="brand-logo mb-3 d-inline-flex" href="{{ route('home') }}">
-                    <span class="brand-mark"><i class="bi bi-calculator"></i></span>
-                    <span>{{ $hub->siteName() }}</span>
+                    @if ($hub->hasLogo())
+                        <img src="{{ $hub->logoUrl() }}" alt="{{ $hub->siteName() }}" style="max-height:48px;width:auto;">
+                    @else
+                        <span class="brand-mark"><i class="bi bi-calculator"></i></span>
+                        <span>{{ $hub->siteName() }}</span>
+                    @endif
                 </a>
                 <p class="text-white-50">{{ __('footer.tagline') }}</p>
                 <div class="social-icons mt-3">

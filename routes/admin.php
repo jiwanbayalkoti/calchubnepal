@@ -114,6 +114,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [SettingController::class, 'save'])->name('settings.save');
+    Route::post('settings/logo', [SettingController::class, 'uploadLogo'])->name('settings.logo.upload');
+    Route::delete('settings/logo', [SettingController::class, 'removeLogo'])->name('settings.logo.remove');
 
     Route::get('ai-prompts/data', [AiPromptController::class, 'data'])->name('ai-prompts.data');
     Route::resource('ai-prompts', AiPromptController::class)

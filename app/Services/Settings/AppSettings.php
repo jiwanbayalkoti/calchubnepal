@@ -23,6 +23,38 @@ class AppSettings
             ?? 'AI Calculator Hub';
     }
 
+    /**
+     * Stored logo reference (public-disk path or absolute URL), or null.
+     */
+    public function logoPath(): ?string
+    {
+        return $this->filledString('site', 'logo');
+    }
+
+    /**
+     * Browser-usable logo URL. Returns a root-relative /storage path for
+     * uploads (host/port agnostic) or the value as-is when it is already a
+     * full/absolute URL. Null when no logo is configured.
+     */
+    public function logoUrl(): ?string
+    {
+        $logo = $this->logoPath();
+        if ($logo === null) {
+            return null;
+        }
+
+        if (str_starts_with($logo, 'http://') || str_starts_with($logo, 'https://') || str_starts_with($logo, '/')) {
+            return $logo;
+        }
+
+        return '/storage/'.ltrim($logo, '/');
+    }
+
+    public function hasLogo(): bool
+    {
+        return $this->logoUrl() !== null;
+    }
+
     public function tagline(): string
     {
         return $this->filledString('site', 'tagline')

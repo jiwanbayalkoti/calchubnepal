@@ -8,6 +8,7 @@ use App\Services\Activity\ActivityLogService;
 use App\Services\Settings\SettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class SettingController extends Controller
@@ -60,5 +61,62 @@ class SettingController extends Controller
         $this->activityLog->log('update', 'settings', null, ['group' => $validated['group']]);
 
         return response()->json(['message' => 'Settings saved successfully.']);
+    }
+
+    /**
+     * Upload/replace the site logo. Stores the image on the public disk and
+     * saves its path as the public `site.logo` setting.
+     */
+    public function uploadLogo(Request $request): JsonResponse
+    {
+        $request->validate([
+            'logo' => ['required', 'file', 'mimes:png,jpg,jpeg,webp,svg,gif', 'max:2048'],
+        ]);
+
+        $old = $this->settings->get('site', 'logo');
+
+        $path = $request->file('logo')->store('branding', 'public');
+
+        $this->settings->set('site', 'logo', $path, 'string', true);
+
+        $this->deleteStoredLogo($old);
+
+        $this->activityLog->log('update', 'settings', null, ['group' => 'site', 'key' => 'logo']);
+
+        return response()->json([
+            'message' => 'Logo uploaded successfully.',
+            'url' => '/storage/'.$path,
+        ]);
+    }
+
+    /**
+     * Remove the current site logo (deletes the file and clears the setting).
+     */
+    public function removeLogo(): JsonResponse
+    {
+        $old = $this->settings->get('site', 'logo');
+
+        $this->deleteStoredLogo($old);
+
+        $this->settings->set('site', 'logo', '', 'string', true);
+
+        $this->activityLog->log('update', 'settings', null, ['group' => 'site', 'key' => 'logo', 'action' => 'remove']);
+
+        return response()->json(['message' => 'Logo removed successfully.']);
+    }
+
+    /**
+     * Delete a previously stored logo file from the public disk (ignores
+     * empty values and externally hosted absolute URLs).
+     */
+    protected function deleteStoredLogo(mixed $value): void
+    {
+        if (! is_string($value) || $value === '' || str_starts_with($value, 'http') || str_starts_with($value, '/')) {
+            return;
+        }
+
+        if (Storage::disk('public')->exists($value)) {
+            Storage::disk('public')->delete($value);
+        }
     }
 }
