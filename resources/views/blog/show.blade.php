@@ -1,7 +1,9 @@
 @extends('layouts.public')
 
 @push('schemas')
-    <script type="application/ld+json">{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @foreach(($schemas ?? []) as $schema)
+        <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @endforeach
 @endpush
 
 @section('breadcrumb')

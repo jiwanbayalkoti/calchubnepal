@@ -75,16 +75,36 @@ class CalculatorController extends Controller
 
         $related = $this->calculators->getRelated($calculator, 6);
 
+        $relatedBlogs = $calculator->blogPosts()
+            ->published()
+            ->latest('published_at')
+            ->take(4)
+            ->get(['id', 'title', 'slug', 'excerpt', 'content', 'blog_category_id', 'published_at']);
+
         $breadcrumbs = [
-            ['name' => 'Home', 'url' => url('/')],
+            ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Calculators', 'url' => route('calculators.index')],
             ['name' => $calculator->category->name, 'url' => route('categories.show', $calculator->category)],
-            ['name' => $calculator->title, 'url' => url()->current()],
+            ['name' => $calculator->title, 'url' => route('calculators.show', $calculator)],
         ];
 
+        $title = $calculator->meta_title
+            ?: $this->seo->applyTemplate('calculator_title_template', [
+                'title' => $calculator->title,
+                'category' => $calculator->category->name,
+                'description' => $calculator->short_description,
+            ], $calculator->title.' — Free Online Calculator | '.$this->hub->siteName());
+
+        $description = $calculator->meta_description
+            ?: $this->seo->applyTemplate('calculator_description_template', [
+                'title' => $calculator->title,
+                'category' => $calculator->category->name,
+                'description' => $calculator->short_description,
+            ], $calculator->short_description ?: $this->hub->defaultMetaDescription());
+
         $meta = $this->seo->buildMeta(null, [
-            'title' => $calculator->meta_title ?: $calculator->title.' — Free Online Calculator',
-            'description' => $calculator->meta_description ?: $calculator->short_description,
+            'title' => $title,
+            'description' => $description,
             'keywords' => $calculator->meta_keywords,
             'og_image' => $calculator->og_image,
             'canonical' => $calculator->canonical_url ?: route('calculators.show', $calculator),
@@ -96,6 +116,7 @@ class CalculatorController extends Controller
                 $calculator->short_description,
                 route('calculators.show', $calculator),
             ),
+            $this->seo->webPageSchema($calculator->title, (string) $description, route('calculators.show', $calculator)),
             $this->seo->breadcrumbSchema($breadcrumbs),
         ];
 
@@ -105,6 +126,18 @@ class CalculatorController extends Controller
                     'question' => $faq->question,
                     'answer' => $faq->answer,
                 ])->all()
+            );
+        }
+
+        if ($calculator->formula_description) {
+            $schemas[] = $this->seo->howToSchema(
+                'How to use '.$calculator->title,
+                (string) $calculator->short_description,
+                [
+                    ['name' => 'Enter your values', 'text' => 'Fill in the input fields for '.$calculator->title.'.'],
+                    ['name' => 'Calculate', 'text' => 'Click Calculate to get instant results.'],
+                    ['name' => 'Review the formula', 'text' => strip_tags((string) $calculator->formula_description)],
+                ]
             );
         }
 
@@ -118,6 +151,7 @@ class CalculatorController extends Controller
         return view('calculators.show', [
             'calculator' => $calculator,
             'related' => $related,
+            'relatedBlogs' => $relatedBlogs,
             'breadcrumbs' => $breadcrumbs,
             'meta' => $meta,
             'schemas' => $schemas,

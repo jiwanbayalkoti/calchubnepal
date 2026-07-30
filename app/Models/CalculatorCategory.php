@@ -78,7 +78,10 @@ class CalculatorCategory extends Model
 
     protected static function booted(): void
     {
-        $forget = static fn () => \App\Support\CatalogStatsCache::forget();
+        $forget = static function (): void {
+            \App\Support\CatalogStatsCache::forget();
+            \App\Support\SitemapCache::forget();
+        };
 
         static::saved($forget);
         static::deleted($forget);

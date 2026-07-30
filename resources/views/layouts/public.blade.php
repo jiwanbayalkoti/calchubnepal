@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#0B6E4F">
+    {{-- theme-color also set in seo-meta from admin settings --}}
 
     @include('partials.seo-meta')
+    @include('partials.seo-global-schemas')
 
     {{-- Early connections for critical third-party origins --}}
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -441,5 +442,6 @@
 <script src="{{ $appJs }}"></script>
 
 @stack('scripts')
+{!! $hub->footerScripts() !!}
 </body>
 </html>

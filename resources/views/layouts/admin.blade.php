@@ -259,6 +259,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('admin.seo.audit') }}" class="nav-link {{ $current === 'admin.seo.audit' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-search-plus"></i>
+                            <p>SEO Audit</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('admin.seo.redirects') }}" class="nav-link {{ str($current)->startsWith('admin.seo.redirects') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-random"></i>
+                            <p>SEO Redirects</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('admin.breath-hold.index') }}" class="nav-link {{ str($current)->startsWith('admin.breath-hold') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-stopwatch"></i>
                             <p>Breath Hold Game</p>

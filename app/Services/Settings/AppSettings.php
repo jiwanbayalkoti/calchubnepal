@@ -116,6 +116,131 @@ class AppSettings
             ?? $this->defaultMetaDescription();
     }
 
+    public function defaultMetaKeywords(): ?string
+    {
+        return $this->filledString('seo', 'default_meta_keywords');
+    }
+
+    public function defaultOgImage(): ?string
+    {
+        $custom = $this->filledString('seo', 'default_og_image');
+        if ($custom) {
+            return str_starts_with($custom, 'http') || str_starts_with($custom, '/')
+                ? $custom
+                : asset('storage/'.ltrim($custom, '/'));
+        }
+
+        return asset('images/og-default.webp');
+    }
+
+    public function publisherName(): string
+    {
+        return $this->filledString('seo', 'publisher_name')
+            ?? $this->siteName();
+    }
+
+    public function themeColor(): string
+    {
+        return $this->filledString('seo', 'theme_color') ?? '#0B6E4F';
+    }
+
+    public function twitterHandle(): ?string
+    {
+        $handle = $this->filledString('seo', 'twitter_site');
+        if (! $handle) {
+            return null;
+        }
+
+        return str_starts_with($handle, '@') ? $handle : '@'.$handle;
+    }
+
+    public function schemaCurrency(): string
+    {
+        return $this->filledString('seo', 'schema_currency') ?? 'USD';
+    }
+
+    public function gaMeasurementId(): ?string
+    {
+        $id = $this->filledString('seo', 'ga_measurement_id')
+            ?? $this->filledString('analytics', 'ga_measurement_id');
+
+        return ($id && ! $this->isPlaceholderId($id)) ? $id : null;
+    }
+
+    public function gtmContainerId(): ?string
+    {
+        return $this->filledString('seo', 'gtm_container_id');
+    }
+
+    public function searchConsoleVerification(): ?string
+    {
+        return $this->filledString('seo', 'google_site_verification');
+    }
+
+    public function bingVerification(): ?string
+    {
+        return $this->filledString('seo', 'bing_site_verification');
+    }
+
+    public function facebookPixelId(): ?string
+    {
+        return $this->filledString('seo', 'facebook_pixel_id');
+    }
+
+    public function headerScripts(): ?string
+    {
+        return $this->filledString('seo', 'header_scripts');
+    }
+
+    public function footerScripts(): ?string
+    {
+        return $this->filledString('seo', 'footer_scripts');
+    }
+
+    /**
+     * Meta template from admin (e.g. calculator_title_template).
+     */
+    public function metaTemplate(string $key): ?string
+    {
+        return $this->filledString('seo', $key);
+    }
+
+    public function localBusinessEnabled(): bool
+    {
+        return $this->bool('seo', 'local_business_enabled', false);
+    }
+
+    public function businessPhone(): ?string
+    {
+        return $this->filledString('seo', 'business_phone');
+    }
+
+    public function businessAddress(): ?string
+    {
+        return $this->filledString('seo', 'business_address')
+            ?? $this->filledString('site', 'address');
+    }
+
+    public function businessCountry(): string
+    {
+        return $this->filledString('seo', 'business_country') ?? 'NP';
+    }
+
+    public function adsenseAutoAds(): bool
+    {
+        $fromSettings = $this->settings->get('ads', 'auto_ads');
+        if ($fromSettings !== null) {
+            return filter_var($fromSettings, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return (bool) config('calculator_hub.adsense.auto_ads', false);
+    }
+
+    public function adsenseRequireConsent(): bool
+    {
+        return (bool) config('calculator_hub.adsense.require_consent', true);
+    }
+
     public function adsenseClientId(): ?string
     {
         $fromSettings = $this->filledString('ads', 'adsense_client_id');
@@ -172,16 +297,6 @@ class AppSettings
         $fromSettings = $this->filledString('ads', 'adsense_client_id');
 
         return filled($fromSettings) && ! $this->isPlaceholderId($fromSettings);
-    }
-
-    public function adsenseAutoAds(): bool
-    {
-        return (bool) config('calculator_hub.adsense.auto_ads', false);
-    }
-
-    public function adsenseRequireConsent(): bool
-    {
-        return (bool) config('calculator_hub.adsense.require_consent', true);
     }
 
     public function aiDefaultProvider(): string

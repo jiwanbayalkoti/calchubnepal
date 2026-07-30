@@ -74,11 +74,41 @@ class BlogController extends Controller
         ];
 
         $meta = $this->seo->buildMeta(null, [
-            'title' => $post->meta_title ?: $post->title.' — AI Calculator Hub',
-            'description' => $post->meta_description ?: $post->excerpt,
+            'title' => $post->meta_title
+                ?: $this->seo->applyTemplate('blog_title_template', [
+                    'title' => $post->title,
+                    'category' => $post->category?->name,
+                    'description' => $post->excerpt,
+                ], $post->title.' — Blog'),
+            'description' => $post->meta_description
+                ?: $this->seo->applyTemplate('blog_description_template', [
+                    'title' => $post->title,
+                    'description' => $post->excerpt,
+                ], $post->excerpt ?: \Illuminate\Support\Str::limit(strip_tags((string) $post->content), 155)),
+            'keywords' => $post->meta_keywords,
             'og_image' => $post->featured_image,
+            'og_type' => 'article',
+            'author' => $post->author?->name,
             'canonical' => route('blog.show', $post),
         ]);
+
+        $imageUrl = $post->featured_image
+            ? (str_starts_with($post->featured_image, 'http') ? $post->featured_image : asset('storage/'.$post->featured_image))
+            : null;
+
+        $schemas = [
+            $this->seo->breadcrumbSchema($breadcrumbs),
+            $this->seo->articleSchema(
+                $post->title,
+                (string) ($post->meta_description ?: $post->excerpt),
+                route('blog.show', $post),
+                $imageUrl,
+                $post->published_at?->toAtomString(),
+                ($post->updated_at ?? $post->published_at)?->toAtomString(),
+                $post->author?->name,
+            ),
+            $this->seo->webPageSchema($post->title, (string) ($post->meta_description ?: $post->excerpt), route('blog.show', $post)),
+        ];
 
         return view('blog.show', [
             'post' => $post,
@@ -87,7 +117,7 @@ class BlogController extends Controller
             'toc' => $toc,
             'breadcrumbs' => $breadcrumbs,
             'meta' => $meta,
-            'breadcrumbSchema' => $this->seo->breadcrumbSchema($breadcrumbs),
+            'schemas' => $schemas,
         ]);
     }
 

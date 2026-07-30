@@ -23,7 +23,7 @@ class PublicSitemapService
             ['label' => 'All Calculators', 'route' => 'calculators.index', 'priority' => 0.9, 'changefreq' => Url::CHANGE_FREQUENCY_DAILY, 'group' => 'main'],
             ['label' => 'Categories', 'route' => 'categories.index', 'priority' => 0.7, 'changefreq' => Url::CHANGE_FREQUENCY_WEEKLY, 'group' => 'main'],
             ['label' => 'Blog', 'route' => 'blog.index', 'priority' => 0.6, 'changefreq' => Url::CHANGE_FREQUENCY_DAILY, 'group' => 'main'],
-            ['label' => 'Search', 'route' => 'search.results', 'priority' => 0.4, 'changefreq' => Url::CHANGE_FREQUENCY_WEEKLY, 'group' => 'main'],
+            // Search is noindex — keep out of XML sitemap
             ['label' => 'Pricing', 'route' => 'pricing', 'priority' => 0.5, 'changefreq' => Url::CHANGE_FREQUENCY_MONTHLY, 'group' => 'main'],
             ['label' => 'About Us', 'route' => 'about', 'priority' => 0.4, 'changefreq' => Url::CHANGE_FREQUENCY_MONTHLY, 'group' => 'main'],
             ['label' => 'Contact', 'route' => 'contact', 'priority' => 0.4, 'changefreq' => Url::CHANGE_FREQUENCY_MONTHLY, 'group' => 'main'],
@@ -109,6 +109,12 @@ class PublicSitemapService
             $lastMod = $post->updated_at ?? $post->published_at;
             if ($lastMod) {
                 $url->setLastModificationDate($lastMod);
+            }
+            if ($post->featured_image) {
+                $image = str_starts_with($post->featured_image, 'http')
+                    ? $post->featured_image
+                    : asset('storage/'.ltrim($post->featured_image, '/'));
+                $url->addImage($image, $post->title);
             }
             $sitemap->add($url);
         });

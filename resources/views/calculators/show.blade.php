@@ -180,6 +180,8 @@
                     @include('partials.calculator.faq', ['calculator' => $calculator])
 
                     @include('partials.calculator.related', ['related' => $related])
+
+                    @include('partials.calculator.related-blogs', ['relatedBlogs' => $relatedBlogs ?? collect()])
                 </div>
 
                 <div class="col-lg-4">

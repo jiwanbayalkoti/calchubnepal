@@ -27,16 +27,41 @@ class CategoryController extends Controller
         $categories = CalculatorCategory::query()->active()->ordered()->get();
 
         $breadcrumbs = [
-            ['name' => 'Home', 'url' => url('/')],
+            ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Categories', 'url' => route('categories.index')],
-            ['name' => $category->name, 'url' => url()->current()],
+            ['name' => $category->name, 'url' => route('categories.show', $category)],
         ];
 
+        $title = $category->meta_title
+            ?: $this->seo->applyTemplate('category_title_template', [
+                'title' => $category->name,
+                'category' => $category->name,
+                'description' => $category->description,
+            ], $category->name.' Calculators');
+
+        $description = $category->meta_description
+            ?: $this->seo->applyTemplate('category_description_template', [
+                'title' => $category->name,
+                'category' => $category->name,
+                'description' => $category->description,
+            ], $category->description ?: 'Browse free '.$category->name.' calculators.');
+
         $meta = $this->seo->buildMeta(null, [
-            'title' => $category->meta_title ?: $category->name.' Calculators — AI Calculator Hub',
-            'description' => $category->meta_description ?: $category->description,
+            'title' => $title,
+            'description' => $description,
             'canonical' => route('categories.show', $category),
         ]);
+
+        $listItems = $calculators->getCollection()->take(20)->map(fn ($c) => [
+            'name' => $c->title,
+            'url' => route('calculators.show', $c),
+        ])->all();
+
+        $schemas = [
+            $this->seo->breadcrumbSchema($breadcrumbs),
+            $this->seo->collectionPageSchema($category->name, (string) $description, route('categories.show', $category), $listItems),
+            $this->seo->webPageSchema($category->name, (string) $description, route('categories.show', $category)),
+        ];
 
         return view('categories.show', [
             'category' => $category,
@@ -44,6 +69,7 @@ class CategoryController extends Controller
             'categories' => $categories,
             'breadcrumbs' => $breadcrumbs,
             'meta' => $meta,
+            'schemas' => $schemas,
             'breadcrumbSchema' => $this->seo->breadcrumbSchema($breadcrumbs),
         ]);
     }

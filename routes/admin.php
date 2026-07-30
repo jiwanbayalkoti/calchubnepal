@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SeoToolsController;
 use App\Http\Controllers\Admin\SeoPageController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SubscriptionPlanController;
@@ -132,4 +133,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('seo-pages', SeoPageController::class)
         ->except(['create', 'edit'])
         ->parameters(['seo-pages' => 'id']);
+
+    Route::get('seo/audit', [SeoToolsController::class, 'audit'])->name('seo.audit');
+    Route::get('seo/redirects', [SeoToolsController::class, 'redirects'])->name('seo.redirects');
+    Route::get('seo/redirects/data', [SeoToolsController::class, 'redirectsData'])->name('seo.redirects.data');
+    Route::post('seo/redirects', [SeoToolsController::class, 'storeRedirect'])->name('seo.redirects.store');
+    Route::put('seo/redirects/{id}', [SeoToolsController::class, 'updateRedirect'])->name('seo.redirects.update');
+    Route::delete('seo/redirects/{id}', [SeoToolsController::class, 'destroyRedirect'])->name('seo.redirects.destroy');
 });

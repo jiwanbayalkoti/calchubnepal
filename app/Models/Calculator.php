@@ -111,6 +111,14 @@ class Calculator extends Model
         )->withPivot('sort_order')->orderBy('calculator_relations.sort_order');
     }
 
+    /**
+     * Blog posts that reference this calculator (internal linking / related guides).
+     */
+    public function blogPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(BlogPost::class, 'blog_post_calculator');
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -148,7 +156,10 @@ class Calculator extends Model
 
     protected static function booted(): void
     {
-        $forget = static fn () => \App\Support\CatalogStatsCache::forget();
+        $forget = static function (): void {
+            \App\Support\CatalogStatsCache::forget();
+            \App\Support\SitemapCache::forget();
+        };
 
         static::saved($forget);
         static::deleted($forget);

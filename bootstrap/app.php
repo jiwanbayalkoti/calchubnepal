@@ -25,11 +25,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(prepend: [
             ForcePreferredHost::class,
+            \App\Http\Middleware\ApplySeoRedirects::class,
         ]);
 
         $middleware->web(append: [
             SetLocale::class,
             TrackPageView::class,
+            \App\Http\Middleware\SecurityHeaders::class,
         ]);
 
         $middleware->alias([
