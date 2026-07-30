@@ -342,6 +342,7 @@
                     @endif
                 </a>
                 <p class="text-white-50">{{ __('footer.tagline') }}</p>
+                {{-- Social icons hidden until profiles are created; uncomment and set links in Admin → Settings → Social.
                 <div class="social-icons mt-3">
                     @php
                         $socialIcons = [
@@ -356,6 +357,7 @@
                         <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ ucfirst($network) }}"><i class="bi {{ $socialIcons[$network] ?? 'bi-link-45deg' }}"></i></a>
                     @endforeach
                 </div>
+                --}}
             </div>
 
             <div class="col-6 col-lg-2">
