@@ -339,6 +339,9 @@ class CalculatorSeeder extends Seeder
         'cognitive_load_calculator' => 'productivity',
         'best_day_to_move_calculator' => 'productivity',
         'decision_fatigue_calculator' => 'productivity',
+
+        // Home
+        'workstation_setup_calculator' => 'home',
     ];
 
     /**
@@ -1102,6 +1105,20 @@ class CalculatorSeeder extends Seeder
                 ['How is safe bearing capacity (SBC) determined?', 'SBC is determined by a geotechnical soil investigation for your specific site - it should never be assumed, as it varies widely with soil type and depth.'],
                 ["What does 'required area' mean?", "It's the minimum footing base area needed so the pressure the footing transfers to the soil does not exceed the soil's safe bearing capacity, calculated as load divided by SBC."],
                 ['How do I check if my proposed footing size is safe?', "Enter your proposed footing length and width, and the calculator computes the actual base pressure and compares it to the safe bearing capacity, reporting 'Safe' or 'Unsafe'."],
+            ],
+        ],
+        'workstation_setup_calculator' => [
+            'title' => 'Workstation Setup Calculator',
+            'icon' => 'bi bi-pc-display-horizontal',
+            'short_description' => 'Estimate the total cost of setting up a professional home office or workstation with desk, chair, monitors, lighting, and accessories.',
+            'description' => "The Workstation Setup Calculator helps you plan and budget for a productive home office or professional workspace. It provides cost estimates for desks, ergonomic chairs, monitors, ambient lighting, storage solutions, peripherals, and cable management - everything you need to create an inspiring and comfortable work environment.",
+            'formula_description' => 'Total Cost = Desk Cost + Chair Cost + (Monitor Cost × Number of Monitors) + Monitor Arm + Lighting + Storage + Peripherals + Cable Management. Each component has a price range based on quality tier, adjusted by your budget preference multiplier.',
+            'meta_title' => 'Workstation Setup Calculator - Home Office Cost Estimator | Calculator Hub',
+            'meta_description' => 'Calculate the total cost of setting up your dream workstation. Estimate prices for desk, chair, monitors, lighting, and accessories for a productive home office.',
+            'faqs' => [
+                ['How much does a basic home office setup cost?', 'A basic home office setup with an essential desk, chair, single monitor, and basic peripherals typically costs $350-700. This provides functional workspace for everyday tasks.'],
+                ['What is included in a premium workstation setup?', 'A premium workstation includes a standing/adjustable desk ($400-800), premium ergonomic chair ($500-1200), dual 4K monitors ($1000-2000), studio-grade lighting ($400-1000), full storage system, and premium peripherals - totaling $3,000-7,000.'],
+                ['Is an ergonomic chair worth the investment?', 'Yes, investing in a quality ergonomic chair ($200-500+) can prevent back pain, improve posture, and increase productivity. For people working 6+ hours daily, the health benefits outweigh the initial cost.'],
             ],
         ],
     ];

@@ -213,6 +213,7 @@ class CalculatorIconMap
             'room_area_calculator' => 'bi-house',
             'solar_requirement_calculator' => 'bi-sun-fill',
             'water_bill_calculator' => 'bi-droplet-fill',
+            'workstation_setup_calculator' => 'bi-pc-display-horizontal',
 
             // Climate & Energy
             'solar_roi_calculator' => 'bi-sun',

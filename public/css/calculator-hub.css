@@ -3564,3 +3564,252 @@ html[data-theme='dark'] .vc-logo-preview {
   content-visibility: auto;
   contain-intrinsic-size: 1px 420px;
 }
+
+/* ==========================================================================
+   Workstation Theme - Warm Ambient Styling
+   Inspired by cozy home office aesthetics with warm lighting
+   ========================================================================== */
+
+.workstation-theme {
+  --ws-warm: #F4A259;
+  --ws-warm-glow: rgba(244, 162, 89, 0.15);
+  --ws-wood: #8B5A2B;
+  --ws-wood-light: #DEB887;
+  --ws-dark-surface: #1A1510;
+  --ws-ambient-shadow: 0 20px 60px rgba(139, 90, 43, 0.15);
+}
+
+.workstation-card {
+  background: linear-gradient(145deg, var(--card) 0%, rgba(244, 162, 89, 0.03) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.workstation-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--ws-warm) 0%, var(--brand) 50%, var(--ws-warm) 100%);
+  opacity: 0.8;
+}
+
+.workstation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ws-ambient-shadow);
+}
+
+.workstation-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  background: linear-gradient(135deg, rgba(244, 162, 89, 0.2) 0%, rgba(11, 110, 79, 0.15) 100%);
+  color: var(--ws-warm);
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 24px rgba(244, 162, 89, 0.2);
+}
+
+html[data-theme='dark'] .workstation-icon {
+  background: linear-gradient(135deg, rgba(244, 162, 89, 0.25) 0%, rgba(22, 165, 121, 0.2) 100%);
+  box-shadow: 0 8px 24px rgba(244, 162, 89, 0.15);
+}
+
+.workstation-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.workstation-description {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.workstation-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.workstation-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 0.5rem 0.75rem;
+  background: rgba(var(--brand-rgb), 0.05);
+  border-radius: var(--radius-sm);
+}
+
+.workstation-feature i {
+  color: var(--ws-warm);
+  font-size: 1rem;
+}
+
+html[data-theme='dark'] .workstation-feature {
+  background: rgba(244, 162, 89, 0.08);
+}
+
+.workstation-ambient {
+  position: relative;
+  background: linear-gradient(180deg, 
+    rgba(244, 162, 89, 0.08) 0%, 
+    transparent 50%,
+    rgba(11, 110, 79, 0.05) 100%
+  );
+  padding: 3rem 0;
+}
+
+.workstation-ambient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(244, 162, 89, 0.15) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.workstation-ambient::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 15%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(11, 110, 79, 0.12) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+html[data-theme='dark'] .workstation-ambient {
+  background: linear-gradient(180deg, 
+    rgba(244, 162, 89, 0.06) 0%, 
+    transparent 50%,
+    rgba(22, 165, 121, 0.04) 100%
+  );
+}
+
+.workstation-glow {
+  position: relative;
+}
+
+.workstation-glow::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 40px;
+  background: radial-gradient(ellipse at center, rgba(244, 162, 89, 0.2) 0%, transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.workstation-cost-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--ws-warm) 0%, #e8923f 100%);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(244, 162, 89, 0.3);
+}
+
+.workstation-cost-badge i {
+  font-size: 0.9rem;
+}
+
+.workstation-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.workstation-setup-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.workstation-setup-item:hover {
+  border-color: rgba(244, 162, 89, 0.4);
+  box-shadow: 0 8px 24px rgba(244, 162, 89, 0.1);
+}
+
+.workstation-setup-item .item-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(244, 162, 89, 0.15) 0%, rgba(11, 110, 79, 0.1) 100%);
+  color: var(--ws-warm);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.workstation-setup-item .item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.workstation-setup-item .item-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+}
+
+.workstation-setup-item .item-price {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.workstation-setup-item .item-price strong {
+  color: var(--brand);
+}
+
+@media (max-width: 767.98px) {
+  .workstation-card {
+    padding: 1.5rem;
+  }
+  
+  .workstation-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 1.5rem;
+  }
+  
+  .workstation-features {
+    grid-template-columns: 1fr 1fr;
+  }
+}
