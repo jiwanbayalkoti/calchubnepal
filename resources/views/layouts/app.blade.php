@@ -4,8 +4,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $appSeo = app(\App\Services\Seo\SeoService::class);
+            $appCanonical = $appSeo->normalizeCanonical(url()->current());
+            $appTitle = config('app.name', 'Laravel');
+        @endphp
+        <title>{{ $appTitle }}</title>
+        <meta name="robots" content="noindex,follow">
+        <meta name="description" content="Private account area — not for public indexing.">
+        <link rel="canonical" href="{{ $appCanonical }}">
+        <meta property="og:title" content="{{ $appTitle }}">
+        <meta property="og:url" content="{{ $appCanonical }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

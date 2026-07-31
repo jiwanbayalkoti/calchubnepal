@@ -47,7 +47,7 @@
 
                 <div class="col-md-6 col-lg-3">
                     <div class="card-surface p-4 h-100">
-                        <h2 class="h5 mb-3">Legal &amp; account</h2>
+                        <h2 class="h5 mb-3">Legal</h2>
                         <ul class="list-unstyled sitemap-list mb-0">
                             @foreach ($legalLinks as $link)
                                 <li class="mb-2"><a href="{{ $link['url'] }}">{{ $link['label'] }}</a></li>

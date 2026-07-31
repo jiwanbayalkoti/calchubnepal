@@ -22,6 +22,12 @@
     $metaLanguage = $meta['language'] ?? str_replace('_', '-', app()->getLocale());
     $themeColor = $meta['theme_color'] ?? $hub->themeColor();
     $twitterSite = $meta['twitter_site'] ?? $hub->twitterHandle();
+
+    // Auth / account / admin — always noindex with self-canonical (overrides CMS).
+    if ($seo->shouldNoindexRequest()) {
+        $metaRobots = 'noindex,follow';
+        $metaCanonical = $seo->normalizeCanonical(url()->current());
+    }
 @endphp
 
 <title>{{ $metaTitle }}</title>

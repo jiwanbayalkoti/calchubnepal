@@ -55,15 +55,14 @@ class PublicSitemapService
     }
 
     /**
-     * Auth / account entry points (HTML only — not in XML).
+     * Extra links for the HTML sitemap legal column (never login/register).
+     * Auth pages are noindex and must stay out of all sitemaps.
      *
      * @return list<array{label: string, url: string}>
      */
     public function accountLinks(): array
     {
         return [
-            ['label' => 'Login', 'url' => route('login')],
-            ['label' => 'Register', 'url' => route('register')],
             ['label' => 'XML Sitemap', 'url' => route('sitemap.xml')],
         ];
     }
@@ -124,6 +123,6 @@ class PublicSitemapService
 
     public function cacheKey(): string
     {
-        return 'calc_hub:sitemap:xml:v3';
+        return 'calc_hub:sitemap:xml:v4';
     }
 }

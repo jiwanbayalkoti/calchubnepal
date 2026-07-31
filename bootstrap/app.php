@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             TrackPageView::class,
             \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\PreventSearchIndexing::class,
         ]);
 
         $middleware->alias([

@@ -4,7 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') | {{ config('app.name') }} Admin</title>
+    @php
+        $adminSeo = app(\App\Services\Seo\SeoService::class);
+        $adminCanonical = $adminSeo->normalizeCanonical(url()->current());
+        $adminTitle = trim($__env->yieldContent('title', 'Dashboard')).' | '.config('app.name').' Admin';
+    @endphp
+    <title>{{ $adminTitle }}</title>
+    <meta name="robots" content="noindex,follow">
+    <meta name="description" content="Private admin panel — not for public indexing.">
+    <link rel="canonical" href="{{ $adminCanonical }}">
+    <meta property="og:title" content="{{ $adminTitle }}">
+    <meta property="og:url" content="{{ $adminCanonical }}">
 
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">

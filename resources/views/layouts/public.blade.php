@@ -7,7 +7,9 @@
     {{-- theme-color also set in seo-meta from admin settings --}}
 
     @include('partials.seo-meta')
-    @include('partials.seo-global-schemas')
+    @unless(app(\App\Services\Seo\SeoService::class)->shouldNoindexRequest())
+        @include('partials.seo-global-schemas')
+    @endunless
 
     {{-- Early connections for critical third-party origins --}}
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">

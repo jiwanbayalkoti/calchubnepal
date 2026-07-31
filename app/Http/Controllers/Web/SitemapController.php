@@ -23,18 +23,28 @@ class SitemapController extends Controller
     public function robots(): Response
     {
         $sitemapUrl = rtrim((string) config('app.url'), '/').'/sitemap.xml';
+
+        // Public auth forms stay Allow so crawlers can read noindex meta.
+        // Authenticated / private areas are Disallow'd (still reachable by users).
         $body = implode("\n", [
             'User-agent: *',
             'Allow: /',
             '',
+            '# Private areas (users can still open these URLs)',
             'Disallow: /admin',
             'Disallow: /account',
             'Disallow: /advertiser',
-            'Disallow: /login',
-            'Disallow: /register',
+            'Disallow: /api/',
             'Disallow: /dashboard',
             'Disallow: /profile',
-            'Disallow: /api/',
+            '',
+            '# Auth forms: crawlable + noindex (not listed in sitemap.xml)',
+            'Allow: /login',
+            'Allow: /register',
+            'Allow: /forgot-password',
+            'Allow: /reset-password',
+            'Allow: /verify-email',
+            'Allow: /confirm-password',
             '',
             'Sitemap: '.$sitemapUrl,
             '',

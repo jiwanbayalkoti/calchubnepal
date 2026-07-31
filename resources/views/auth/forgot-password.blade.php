@@ -1,3 +1,4 @@
+
 <x-guest-layout
     title="Reset your password"
     subtitle="Enter your email and we’ll send a link to choose a new password."

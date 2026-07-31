@@ -420,4 +420,68 @@ class SeoService
 
         return $schemas;
     }
+
+    /**
+     * Auth, account, admin and other private URLs must not be indexed.
+     * Pages stay crawlable (no robots.txt block for public auth forms) so
+     * Google can see the noindex directive when following in-site links.
+     */
+    public function shouldNoindexRequest(?\Illuminate\Http\Request $request = null): bool
+    {
+        $request ??= request();
+
+        if ($request->routeIs([
+            'login',
+            'register',
+            'password.*',
+            'verification.*',
+            'dashboard',
+            'profile.*',
+            'admin.*',
+            'account.*',
+            'advertiser.*',
+        ])) {
+            return true;
+        }
+
+        $path = trim($request->path(), '/');
+
+        if ($path === '') {
+            return false;
+        }
+
+        foreach ([
+            'login',
+            'register',
+            'forgot-password',
+            'reset-password',
+            'verify-email',
+            'confirm-password',
+            'dashboard',
+            'profile',
+            'admin',
+            'account',
+            'advertiser',
+        ] as $prefix) {
+            if ($path === $prefix || str_starts_with($path, $prefix.'/')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Meta defaults for private / auth pages: noindex + self-canonical.
+     *
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    public function noindexMeta(array $overrides = []): array
+    {
+        return $this->buildMeta(null, array_merge([
+            'robots' => 'noindex,follow',
+            'canonical' => $this->normalizeCanonical(url()->current()),
+        ], $overrides));
+    }
 }

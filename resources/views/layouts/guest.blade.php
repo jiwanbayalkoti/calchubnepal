@@ -7,10 +7,11 @@
     <meta name="theme-color" content="#0B6E4F">
 
     @php
-        $meta = [
+        $seo = app(\App\Services\Seo\SeoService::class);
+        $meta = $seo->noindexMeta([
             'title' => ($title ? $title.' | ' : '').$hub->siteName(),
-            'robots' => 'noindex,follow',
-        ];
+            'description' => $subtitle ?? ($hub->defaultMetaDescription()),
+        ]);
     @endphp
     @include('partials.seo-meta')
     @include('partials.gtag')
