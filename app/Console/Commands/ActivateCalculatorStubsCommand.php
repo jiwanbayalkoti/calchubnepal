@@ -253,10 +253,21 @@ HTML;
             ->whereIn('slug', ['pension-lump-sum-vs-annuity-calculator', 'pension-lump-sum-vs-monthly-decision-calculator'])
             ->get()
             ->each(function (Calculator $calculator) use ($description, $faqs) {
+                $seo = match ($calculator->slug) {
+                    'pension-lump-sum-vs-monthly-decision-calculator' => [
+                        'meta_title' => 'Pension Lump Sum vs Monthly Decision - Breakeven Age Tool',
+                        'meta_description' => 'Decide pension lump sum vs monthly payments with NPV, breakeven age and longevity sensitivity at ages 75, 85 and 95.',
+                        'meta_keywords' => 'pension lump sum vs monthly, pension decision calculator, pension breakeven age, longevity sensitivity, pension NPV',
+                    ],
+                    default => [
+                        'meta_title' => 'Pension Lump Sum vs Annuity Calculator - Compare Offers Free',
+                        'meta_description' => 'Compare pension lump-sum vs monthly annuity NPV, breakeven age and longevity. Free calculator with COLA and discount rate.',
+                        'meta_keywords' => 'pension lump sum vs annuity, pension calculator, pension buyout calculator, monthly pension vs lump sum, pension NPV calculator, pension breakeven age',
+                    ],
+                };
+
                 $calculator->update([
-                    'meta_title' => 'Pension Lump Sum vs Annuity Calculator – Compare Offers Free',
-                    'meta_description' => 'Compare pension lump-sum vs monthly annuity NPV, breakeven age and longevity. Free calculator with COLA and discount rate.',
-                    'meta_keywords' => 'pension lump sum vs annuity, pension calculator, pension buyout calculator, monthly pension vs lump sum, pension NPV calculator, pension breakeven age',
+                    ...$seo,
                     'description' => $description,
                 ]);
 
