@@ -2069,7 +2069,8 @@ html[data-theme='dark'] .faq-accordion .accordion-button:not(.collapsed) {
   margin-top: 3rem;
 }
 
-.site-footer h6 {
+.site-footer h6,
+.site-footer .footer-heading {
   color: #fff;
   font-family: var(--font-ui);
   font-weight: 700;

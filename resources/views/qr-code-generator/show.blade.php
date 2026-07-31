@@ -635,25 +635,25 @@
                     <h2 class="h5 mb-3">{{ __('qr.faq_heading') }}</h2>
                     <div class="accordion" id="qrFaq">
                         <div class="accordion-item border-0 mb-2">
-                            <h3 class="accordion-header">
+                            <div class="accordion-header">
                                 <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse" data-bs-target="#qrFaq1">{{ __('qr.faq1_q') }}</button>
-                            </h3>
+                            </div>
                             <div id="qrFaq1" class="accordion-collapse collapse" data-bs-parent="#qrFaq">
                                 <div class="accordion-body text-muted-custom">{{ __('qr.faq1_a') }}</div>
                             </div>
                         </div>
                         <div class="accordion-item border-0 mb-2">
-                            <h3 class="accordion-header">
+                            <div class="accordion-header">
                                 <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse" data-bs-target="#qrFaq2">{{ __('qr.faq2_q') }}</button>
-                            </h3>
+                            </div>
                             <div id="qrFaq2" class="accordion-collapse collapse" data-bs-parent="#qrFaq">
                                 <div class="accordion-body text-muted-custom">{{ __('qr.faq2_a') }}</div>
                             </div>
                         </div>
                         <div class="accordion-item border-0">
-                            <h3 class="accordion-header">
+                            <div class="accordion-header">
                                 <button class="accordion-button collapsed rounded" type="button" data-bs-toggle="collapse" data-bs-target="#qrFaq3">{{ __('qr.faq3_q') }}</button>
-                            </h3>
+                            </div>
                             <div id="qrFaq3" class="accordion-collapse collapse" data-bs-parent="#qrFaq">
                                 <div class="accordion-body text-muted-custom">{{ __('qr.faq3_a') }}</div>
                             </div>

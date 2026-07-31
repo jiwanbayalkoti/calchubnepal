@@ -90,7 +90,7 @@
 
                 <div class="col-lg-4">
                     <div class="card-surface p-4 h-100">
-                        <h3 class="h5 mb-3">Get in touch</h3>
+                        <h2 class="h5 mb-3">Get in touch</h2>
                         <p class="text-muted-custom">
                             <i class="bi bi-envelope me-2"></i>
                             <a href="mailto:{{ $hub->supportEmail() }}">{{ $hub->supportEmail() }}</a>

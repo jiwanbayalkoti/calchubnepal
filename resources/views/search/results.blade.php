@@ -12,13 +12,13 @@
         <div class="container">
             <div class="section-heading">
                 <span class="eyebrow">Search</span>
-                <h2>
+                <h1>
                     @if($term)
                         Results for "{{ $term }}"
                     @else
                         Search calculators
                     @endif
-                </h2>
+                </h1>
             </div>
 
             <form method="GET" action="{{ route('search.results') }}" class="search-box mb-4" style="max-width: 480px;">

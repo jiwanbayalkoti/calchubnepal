@@ -37,7 +37,7 @@
 
                     @if($post->calculators->isNotEmpty())
                         <section class="mt-5">
-                            <h3 class="h5 mb-3">Calculators mentioned in this article</h3>
+                            <h2 class="h5 mb-3">Calculators mentioned in this article</h2>
                             <div class="row g-3">
                                 @foreach($post->calculators as $calc)
                                     <div class="col-6 col-md-3">
@@ -53,12 +53,12 @@
 
                     @if($related->isNotEmpty())
                         <section class="mt-5">
-                            <h3 class="h5 mb-3">Related articles</h3>
+                            <h2 class="h5 mb-3">Related articles</h2>
                             <div class="row g-4">
                                 @foreach($related as $item)
                                     <div class="col-md-4">
                                         <a href="{{ route('blog.show', $item) }}" class="card-surface blog-card d-block h-100 text-decoration-none p-3">
-                                            <h4 class="h6" style="color: var(--ink);">{{ $item->title }}</h4>
+                                            <h3 class="h6" style="color: var(--ink);">{{ $item->title }}</h3>
                                             <p class="reading-meta mb-0">{{ $item->reading_time_minutes }} min read</p>
                                         </a>
                                     </div>
@@ -72,7 +72,7 @@
                     <aside class="blog-sidebar-sticky">
                         @if(!empty($toc))
                             <nav class="toc-box" aria-label="On this page">
-                                <h6 class="text-uppercase small fw-bold text-muted-custom mb-3">On this page</h6>
+                                <p class="text-uppercase small fw-bold text-muted-custom mb-3">On this page</p>
                                 <div class="toc-box__links">
                                     @foreach($toc as $item)
                                         <a href="#{{ $item['id'] }}" class="toc-link{{ $item['level'] === 3 ? ' ps-3' : '' }}" data-toc-target="{{ $item['id'] }}">{{ $item['text'] }}</a>

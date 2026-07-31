@@ -12,7 +12,7 @@
         <div class="container">
             <div class="section-heading">
                 <span class="eyebrow">Insights</span>
-                <h2>Guides &amp; explainers</h2>
+                <h1 class="h2 mb-0">Guides &amp; explainers</h1>
             </div>
 
             @if($featured)
@@ -25,7 +25,7 @@
                         @endif
                         <div class="col-md-7 p-4 d-flex flex-column justify-content-center">
                             <span class="badge-soft-accent mb-2" style="width:fit-content;">Featured</span>
-                            <h3 class="h4" style="color: var(--ink);">{{ $featured->title }}</h3>
+                            <h2 class="h4" style="color: var(--ink);">{{ $featured->title }}</h2>
                             <p class="text-muted-custom">{{ $featured->excerpt }}</p>
                             <p class="reading-meta mb-0"><i class="bi bi-clock"></i> {{ $featured->reading_time_minutes }} min read &middot; {{ $featured->published_at?->format('M d, Y') }}</p>
                         </div>
@@ -65,7 +65,7 @@
                     @include('partials.ads.sidebar')
 
                     <div class="card-surface p-3">
-                        <h6 class="text-uppercase small fw-bold text-muted-custom mb-3">Categories</h6>
+                        <p class="text-uppercase small fw-bold text-muted-custom mb-3">Categories</p>
                         <ul class="list-unstyled mb-0">
                             @foreach($categories as $category)
                                 <li class="mb-2">

@@ -12,7 +12,7 @@
         <div class="container">
             <div class="section-heading">
                 <span class="eyebrow">Browse</span>
-                <h2>All categories</h2>
+                <h1 class="h2 mb-0">All categories</h1>
             </div>
 
             <div class="row g-3">

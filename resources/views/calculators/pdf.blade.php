@@ -25,7 +25,7 @@
         <div class="muted">Generated on {{ $generatedAt->format('M d, Y H:i') }}</div>
     </div>
 
-    <h3>Result</h3>
+    <h2>Result</h2>
     @foreach($results as $key => $value)
         <div class="metric">
             <div class="metric-label">{{ ucwords(str_replace('_', ' ', $key)) }}</div>
@@ -34,7 +34,7 @@
     @endforeach
 
     @if(!empty($breakdown))
-        <h3>Breakdown</h3>
+        <h2>Breakdown</h2>
         <table>
             @foreach($breakdown as $key => $value)
                 <tr>
@@ -46,7 +46,7 @@
     @endif
 
     @if(!empty($inputs))
-        <h3>Inputs Used</h3>
+        <h2>Inputs Used</h2>
         <table>
             @foreach($inputs as $key => $value)
                 <tr>

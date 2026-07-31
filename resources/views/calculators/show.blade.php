@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="mb-0">{{ __('calc.result') }}</h5>
+                            <h2 class="h5 mb-0">{{ __('calc.result') }}</h2>
                             <div class="result-actions d-none gap-2">
                                 @if ($hub->aiEnabled())
                                     <button type="button" class="btn btn-sm btn-soft js-ai-explain ai-explain-toggle d-none" data-slug="{{ $calculator->slug }}">
@@ -109,7 +109,7 @@
                     {{-- ==================================================== --}}
                     @if($calculator->formula_description)
                         <section class="mb-5">
-                            <h3 class="h4 mb-3">{{ __('calc.how') }}</h3>
+                            <h2 class="h4 mb-3">{{ __('calc.how') }}</h2>
                             <div class="card-surface p-4">
                                 <p class="mb-0">{{ $calculator->formula_description }}</p>
                                 @if($calculator->formula_expression)
@@ -124,10 +124,10 @@
                     {{-- ==================================================== --}}
                     @if($calculator->examples->isNotEmpty())
                         <section class="mb-5">
-                            <h3 class="h4 mb-3">Example</h3>
+                            <h2 class="h4 mb-3">Example</h2>
                             @foreach($calculator->examples as $example)
                                 <div class="card-surface p-4 mb-3">
-                                    <h4 class="h6">{{ $example->title }}</h4>
+                                    <h3 class="h6">{{ $example->title }}</h3>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <p class="text-muted-custom small mb-1 text-uppercase fw-bold">Inputs</p>
@@ -172,7 +172,7 @@
 
                     @if($calculator->description)
                         <section class="mb-5">
-                            <h3 class="h4 mb-3">{{ __('calc.about') }}</h3>
+                            <h2 class="h4 mb-3">{{ __('calc.about') }}</h2>
                             <div class="text-muted-custom">{!! $calculator->description !!}</div>
                         </section>
                     @endif
@@ -188,7 +188,7 @@
                     @include('partials.ads.sidebar')
 
                     <div class="card-surface p-3 mb-3">
-                        <h6 class="text-uppercase small fw-bold text-muted-custom mb-3">{{ __('calc.in_category') }}</h6>
+                        <p class="text-uppercase small fw-bold text-muted-custom mb-3">{{ __('calc.in_category') }}</p>
                         <a href="{{ route('categories.show', $calculator->category) }}" class="d-flex align-items-center gap-2 text-decoration-none">
                             <span class="cat-icon" style="width:44px;height:44px;"><i class="bi {{ $calculator->category->icon ?? 'bi-grid' }}"></i></span>
                             <span class="fw-semibold" style="color: var(--ink);">{{ $calculator->category->name }}</span>
@@ -196,7 +196,7 @@
                     </div>
 
                     <div class="card-surface p-3 mb-3">
-                        <h6 class="text-uppercase small fw-bold text-muted-custom mb-2">Feedback</h6>
+                        <p class="text-uppercase small fw-bold text-muted-custom mb-2">Feedback</p>
                         <p class="small text-muted-custom mb-3">Was this calculator helpful? Tell us in a sentence.</p>
                         <form class="js-feedback-form" action="{{ route('feedback.store') }}" method="POST">
                             @csrf

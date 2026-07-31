@@ -50,7 +50,7 @@
                     @include('partials.ads.sidebar')
 
                     <div class="card-surface p-3">
-                        <h6 class="text-uppercase small fw-bold text-muted-custom mb-3">Other categories</h6>
+                        <p class="text-uppercase small fw-bold text-muted-custom mb-3">Other categories</p>
                         <ul class="list-unstyled mb-0">
                             @foreach($categories as $other)
                                 <li class="mb-2">

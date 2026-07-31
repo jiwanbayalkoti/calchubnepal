@@ -12,7 +12,7 @@
         <div class="container">
             <div class="section-heading">
                 <span class="eyebrow">All calculators</span>
-                <h2>Find the right calculator</h2>
+                <h1 class="h2 mb-0">Find the right calculator</h1>
             </div>
 
             <form method="GET" action="{{ route('calculators.index') }}" class="row g-2 align-items-center mb-4">

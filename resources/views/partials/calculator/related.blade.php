@@ -1,6 +1,6 @@
 @if(($related ?? collect())->isNotEmpty())
     <section class="mt-5">
-        <h3 class="h4 mb-4">Related Calculators</h3>
+        <h2 class="h4 mb-4">Related Calculators</h2>
         <div class="row g-3">
             @foreach($related as $item)
                 <div class="col-6 col-md-4 col-lg-2">

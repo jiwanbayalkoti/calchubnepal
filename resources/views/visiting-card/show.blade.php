@@ -198,25 +198,25 @@
                     <h2 class="h5 mb-3">{{ __('vc.faq_heading') }}</h2>
                     <div class="accordion" id="vcFaq">
                         <div class="accordion-item">
-                            <h3 class="accordion-header">
+                            <div class="accordion-header">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#vcFaq1">{{ __('vc.faq1_q') }}</button>
-                            </h3>
+                            </div>
                             <div id="vcFaq1" class="accordion-collapse collapse show" data-bs-parent="#vcFaq">
                                 <div class="accordion-body">{{ __('vc.faq1_a') }}</div>
                             </div>
                         </div>
                         <div class="accordion-item">
-                            <h3 class="accordion-header">
+                            <div class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#vcFaq2">{{ __('vc.faq2_q') }}</button>
-                            </h3>
+                            </div>
                             <div id="vcFaq2" class="accordion-collapse collapse" data-bs-parent="#vcFaq">
                                 <div class="accordion-body">{{ __('vc.faq2_a') }}</div>
                             </div>
                         </div>
                         <div class="accordion-item">
-                            <h3 class="accordion-header">
+                            <div class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#vcFaq3">{{ __('vc.faq3_q') }}</button>
-                            </h3>
+                            </div>
                             <div id="vcFaq3" class="accordion-collapse collapse" data-bs-parent="#vcFaq">
                                 <div class="accordion-body">{{ __('vc.faq3_a') }}</div>
                             </div>

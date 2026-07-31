@@ -362,7 +362,7 @@
             </div>
 
             <div class="col-6 col-lg-2">
-                <h6>{{ __('footer.company') }}</h6>
+                <p class="footer-heading">{{ __('footer.company') }}</p>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ route('about') }}">{{ __('footer.about') }}</a></li>
                     <li class="mb-2"><a href="{{ route('qr-code-generator') }}">{{ __('footer.qr') }}</a></li>
@@ -374,7 +374,7 @@
             </div>
 
             <div class="col-6 col-lg-3">
-                <h6>{{ __('footer.categories') }}</h6>
+                <p class="footer-heading">{{ __('footer.categories') }}</p>
                 <ul class="list-unstyled">
                     @foreach(\Illuminate\Support\Facades\Cache::remember('calc_hub:footer:categories', 3600, function () {
                         return \App\Models\CalculatorCategory::query()
@@ -394,7 +394,7 @@
             </div>
 
             <div class="col-6 col-lg-3">
-                <h6>{{ __('footer.legal') }}</h6>
+                <p class="footer-heading">{{ __('footer.legal') }}</p>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ route('privacy') }}">{{ __('footer.privacy') }}</a></li>
                     <li class="mb-2"><a href="{{ route('terms') }}">{{ __('footer.terms') }}</a></li>

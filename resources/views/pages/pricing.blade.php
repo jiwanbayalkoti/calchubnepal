@@ -18,7 +18,7 @@
                             @if($index === 1)
                                 <span class="badge-soft-accent mb-3 d-inline-block">Most Popular</span>
                             @endif
-                            <h3 class="h5">{{ $plan->name }}</h3>
+                            <h2 class="h5">{{ $plan->name }}</h2>
                             <p class="text-muted-custom small">{{ $plan->description }}</p>
                             <div class="price-amount">
                                 {{ $plan->isFree() ? 'Free' : $plan->currency.' '.number_format((float) $plan->price, 0) }}
