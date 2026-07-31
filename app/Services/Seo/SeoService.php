@@ -87,12 +87,11 @@ class SeoService
     }
 
     /**
-     * Force canonical onto APP_URL host/scheme; strip query strings.
+     * Force canonical onto APP_URL host/scheme/port; strip query strings.
      */
     public function normalizeCanonical(string $url): string
     {
         $root = rtrim((string) config('app.url'), '/');
-        $rootParts = parse_url($root) ?: [];
 
         if ($url === '' || $url === '/') {
             return $root.'/';
@@ -104,10 +103,8 @@ class SeoService
 
         $parts = parse_url($url) ?: [];
         $path = $parts['path'] ?? '/';
-        $scheme = $rootParts['scheme'] ?? 'https';
-        $host = $rootParts['host'] ?? ($parts['host'] ?? 'localhost');
 
-        return $scheme.'://'.$host.$path;
+        return $root.($path === '' ? '/' : $path);
     }
 
     /**

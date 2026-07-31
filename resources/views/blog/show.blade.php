@@ -31,10 +31,6 @@
                         {!! $contentHtml !!}
                     </div>
 
-                    <div class="d-flex align-items-center justify-content-between mt-5 no-print">
-                        @include('partials.calculator.share-buttons', ['calculator' => $post])
-                    </div>
-
                     @if($post->calculators->isNotEmpty())
                         <section class="mt-5">
                             <h2 class="h5 mb-3">Calculators mentioned in this article</h2>

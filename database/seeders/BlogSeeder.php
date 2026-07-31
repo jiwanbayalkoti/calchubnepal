@@ -7,6 +7,7 @@ use App\Models\BlogPost;
 use App\Models\BlogTag;
 use App\Models\Calculator;
 use App\Models\User;
+use Database\Seeders\Content\GuideBlogContentMap;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -167,6 +168,13 @@ class BlogSeeder extends Seeder
     protected function seedPosts(User $author, array $categoryIds, array $tagIds): void
     {
         foreach ($this->posts() as $index => $post) {
+            $content = GuideBlogContentMap::html($post['slug']) ?? $post['content'];
+            $words = GuideBlogContentMap::wordCount($content);
+            $readingMinutes = max(
+                (int) ($post['reading_time_minutes'] ?? 6),
+                (int) ceil($words / 200)
+            );
+
             $model = BlogPost::query()->updateOrCreate(
                 ['slug' => $post['slug']],
                 [
@@ -174,14 +182,14 @@ class BlogSeeder extends Seeder
                     'user_id' => $author->id,
                     'title' => $post['title'],
                     'excerpt' => $post['excerpt'],
-                    'content' => $post['content'],
+                    'content' => $content,
                     'featured_image' => null,
                     'meta_title' => $post['meta_title'],
                     'meta_description' => $post['meta_description'],
                     'meta_keywords' => $post['meta_keywords'],
                     'status' => BlogPost::STATUS_PUBLISHED,
                     'published_at' => now()->subDays(count($this->posts()) - $index)->setTime(10, 0),
-                    'reading_time_minutes' => $post['reading_time_minutes'],
+                    'reading_time_minutes' => $readingMinutes,
                     'is_featured' => $post['is_featured'],
                     'ai_generated' => false,
                     'created_by' => $author->id,

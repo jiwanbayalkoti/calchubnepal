@@ -40,7 +40,7 @@ class ForcePreferredHost
         }
 
         $path = $request->getPathInfo() ?: '/';
-        $target = $parts['scheme'].'://'.$parts['host'].$path;
+        $target = rtrim($preferred, '/').$path;
 
         if ($query = $request->getQueryString()) {
             $target .= '?'.$query;
