@@ -18,7 +18,7 @@
     return match ? decodeURIComponent(match[1]) : '';
   }
 
-  function csrfHeaders() {
+  function csrfHeaders(extra) {
     const headers = {
       'X-CSRF-TOKEN': getCsrfToken(),
       'X-Requested-With': 'XMLHttpRequest',
@@ -26,6 +26,11 @@
     const xsrf = getXsrfToken();
     if (xsrf) {
       headers['X-XSRF-TOKEN'] = xsrf;
+    }
+    if (extra && typeof extra === 'object') {
+      Object.keys(extra).forEach(function (key) {
+        headers[key] = extra[key];
+      });
     }
     return headers;
   }
@@ -277,14 +282,30 @@
 
   function clearErrors($form) {
     $form.find('.is-invalid').removeClass('is-invalid');
-    $form.find('.invalid-feedback').remove();
+    // Keep permanent placeholder .invalid-feedback nodes; only clear text / remove extras.
+    $form.find('.invalid-feedback').each(function () {
+      const $el = $(this);
+      if ($el.data('dynamic')) {
+        $el.remove();
+      } else {
+        $el.text('').hide();
+      }
+    });
   }
 
   function showErrors($form, errors) {
     $.each(errors, function (field, messages) {
       const $field = $form.find('[name="' + field + '"]');
       $field.addClass('is-invalid');
-      $field.after('<div class="invalid-feedback">' + escapeHtml(messages[0]) + '</div>');
+      let $fb = $field.nextAll('.invalid-feedback').first();
+      if (! $fb.length) {
+        $fb = $field.closest('.mb-2, .col-12, .col-md-6, .form-group, div').find('.invalid-feedback').first();
+      }
+      if ($fb.length) {
+        $fb.text(messages[0]).show();
+      } else {
+        $field.after('<div class="invalid-feedback" data-dynamic="1" style="display:block">' + escapeHtml(messages[0]) + '</div>');
+      }
     });
   }
 
@@ -731,6 +752,7 @@
       method: 'POST',
       data: $form.serialize(),
       dataType: 'json',
+      headers: csrfHeaders({ Accept: 'application/json' }),
     })
       .done(function (response) {
         if (window.Swal) {
@@ -750,6 +772,12 @@
       .fail(function (xhr) {
         if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
           showErrors($form, xhr.responseJSON.errors);
+        } else if (xhr.status === 419) {
+          if (window.toastr) {
+            toastr.error('Session expired. Please refresh the page and try again.');
+          } else {
+            alert('Session expired. Please refresh the page and try again.');
+          }
         } else if (window.toastr) {
           toastr.error('Unable to send feedback. Please try again.');
         } else {

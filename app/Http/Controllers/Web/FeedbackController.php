@@ -9,6 +9,8 @@ use App\Notifications\Admin\FeedbackReceived;
 use App\Services\Admin\AdminNotifier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class FeedbackController extends Controller
 {
@@ -27,11 +29,18 @@ class FeedbackController extends Controller
         $feedback = Feedback::create($data);
         $feedback->load(['user', 'calculator']);
 
-        $this->notifier->notify(new FeedbackReceived($feedback));
+        try {
+            $this->notifier->notify(new FeedbackReceived($feedback));
+        } catch (Throwable $e) {
+            Log::error('Failed to notify admins of feedback.', [
+                'feedback_id' => $feedback->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         $message = 'Thanks for your feedback — we appreciate it!';
 
-        if ($request->wantsJson() || $request->ajax()) {
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json(['message' => $message]);
         }
 

@@ -19,7 +19,9 @@ use App\Support\CatalogStatsCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use Throwable;
 
 class PageController extends Controller
 {
@@ -95,9 +97,17 @@ class PageController extends Controller
         $message = ContactMessage::create($data);
 
         $this->activity->log('created', 'contact_message', $message, ['subject' => $message->subject]);
-        $this->notifier->notify(new ContactMessageReceived($message));
 
-        if ($request->wantsJson() || $request->ajax()) {
+        try {
+            $this->notifier->notify(new ContactMessageReceived($message));
+        } catch (Throwable $e) {
+            Log::error('Failed to notify admins of contact message.', [
+                'contact_message_id' => $message->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'message' => "Thanks for reaching out! We'll get back to you shortly.",
             ]);

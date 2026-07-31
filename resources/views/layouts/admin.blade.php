@@ -359,35 +359,20 @@
             }
         });
 
-        toastr.options = {
-            closeButton: true,
-            progressBar: true,
-            positionClass: 'toast-top-right',
-            timeOut: 4000,
-        };
+        if (window.toastr) {
+            toastr.options = {
+                closeButton: true,
+                progressBar: true,
+                positionClass: 'toast-top-right',
+                timeOut: 4000,
+            };
+        }
 
-        $('.select2').select2({ theme: 'bootstrap4', width: '100%' });
-
-        // Re-init Select2 inside modals so dropdowns render above the modal
-        $('.modal').on('shown.bs.modal', function () {
-            $(this).find('select.select2').each(function () {
-                if ($(this).hasClass('select2-hidden-accessible')) {
-                    $(this).select2('destroy');
-                }
-                $(this).select2({ theme: 'bootstrap4', width: '100%', dropdownParent: $(this).closest('.modal') });
-            });
-        });
-
-        $('#darkModeToggle').on('click', function (e) {
-            e.preventDefault();
-            const isDark = $('body').toggleClass('dark-mode').hasClass('dark-mode');
-            document.cookie = 'admin_dark_mode=' + (isDark ? '1' : '0') + ';path=/;max-age=' + 60 * 60 * 24 * 365;
-        });
-
+        // Relative URLs — avoid APP_URL / www mismatches breaking session cookies.
         const notifRoutes = {
-            recent: @json(route('admin.notifications.recent')),
-            markAll: @json(route('admin.notifications.read-all')),
-            markRead: @json(route('admin.notifications.read', ['id' => '__ID__'])),
+            recent: @json(route('admin.notifications.recent', absolute: false)),
+            markAll: @json(route('admin.notifications.read-all', absolute: false)),
+            markRead: @json(route('admin.notifications.read', ['id' => '__ID__'], absolute: false)),
         };
 
         function updateNotifBadge(count) {
@@ -426,12 +411,30 @@
         }
 
         function loadAdminNotifications() {
-            $.getJSON(notifRoutes.recent)
+            $.ajax({
+                url: notifRoutes.recent,
+                method: 'GET',
+                dataType: 'json',
+                cache: false,
+            })
                 .done(function (res) {
                     updateNotifBadge(res.unread || 0);
                     renderNotifications(res.data || []);
+                })
+                .fail(function (xhr) {
+                    const $list = $('#adminNotifList').empty();
+                    if (xhr.status === 401 || xhr.status === 419) {
+                        $list.append('<span class="dropdown-item text-muted text-sm">Session expired — refresh the page.</span>');
+                    } else {
+                        $list.append('<span class="dropdown-item text-muted text-sm">Could not load notifications.</span>');
+                    }
+                    updateNotifBadge(0);
                 });
         }
+
+        // Load notifications before optional UI plugins so CDN failures cannot block the bell.
+        loadAdminNotifications();
+        setInterval(loadAdminNotifications, 60000);
 
         $('#adminNotificationsDropdown').on('show.bs.dropdown', loadAdminNotifications);
 
@@ -447,18 +450,36 @@
             $.post(notifRoutes.markAll).done(function () {
                 updateNotifBadge(0);
                 loadAdminNotifications();
-                toastr.success('All notifications marked as read.');
+                if (window.toastr) {
+                    toastr.success('All notifications marked as read.');
+                }
             });
         });
 
-        loadAdminNotifications();
-        setInterval(loadAdminNotifications, 60000);
+        if ($.fn.select2) {
+            $('.select2').select2({ theme: 'bootstrap4', width: '100%' });
+
+            $('.modal').on('shown.bs.modal', function () {
+                $(this).find('select.select2').each(function () {
+                    if ($(this).hasClass('select2-hidden-accessible')) {
+                        $(this).select2('destroy');
+                    }
+                    $(this).select2({ theme: 'bootstrap4', width: '100%', dropdownParent: $(this).closest('.modal') });
+                });
+            });
+        }
+
+        $('#darkModeToggle').on('click', function (e) {
+            e.preventDefault();
+            const isDark = $('body').toggleClass('dark-mode').hasClass('dark-mode');
+            document.cookie = 'admin_dark_mode=' + (isDark ? '1' : '0') + ';path=/;max-age=' + 60 * 60 * 24 * 365;
+        });
 
         @if(session('success'))
-            toastr.success(@json(session('success')));
+            if (window.toastr) { toastr.success(@json(session('success'))); }
         @endif
         @if(session('error'))
-            toastr.error(@json(session('error')));
+            if (window.toastr) { toastr.error(@json(session('error'))); }
         @endif
     });
 </script>
